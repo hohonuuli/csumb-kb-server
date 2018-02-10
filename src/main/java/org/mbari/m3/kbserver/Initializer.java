@@ -35,7 +35,7 @@ public class Initializer {
         if (injector == null) {
             String moduleName = getConfig().getString("app.injector.module.class");
             try {
-                Class clazz = Class.forName(moduleName);
+                Class<?> clazz = Class.forName(moduleName);
                 // TODO in java 9 use clazz.getDeclaredConstructor().newInstance()
                 // You'll have to find one where constructor.getParameterCount == 0
                 Module module = (Module) clazz.newInstance();
