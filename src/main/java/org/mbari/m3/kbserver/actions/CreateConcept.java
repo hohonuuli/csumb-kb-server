@@ -1,6 +1,6 @@
 package org.mbari.m3.kbserver.actions;
 
-import javax.management.RuntimeErrorException;
+import java.util.function.Function;
 
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
@@ -8,14 +8,13 @@ import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 
 /**
  * CreateConcept
  */
-public class CreateConcept {
+public class CreateConcept implements Function<ToolBelt, Concept> {
 
     private final String parentName;
     private final String name;
@@ -27,7 +26,7 @@ public class CreateConcept {
         this.userAccount = userAccount;
     }
 
-    public void apply(ToolBelt toolBelt) {
+    public Concept apply(ToolBelt toolBelt) {
 
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
@@ -53,6 +52,7 @@ public class CreateConcept {
         dao.persist(history);
         dao.endTransaction();
         dao.close();
+        return concept;
     }
 
 
