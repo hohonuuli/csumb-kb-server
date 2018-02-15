@@ -1,7 +1,5 @@
 package org.mbari.m3.kbserver.actions;
 
-import java.util.function.Function;
-
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -14,7 +12,7 @@ import vars.knowledgebase.ui.ToolBelt;
 /**
  * CreateConcept
  */
-public class CreateConcept implements Function<ToolBelt, Concept> {
+public class CreateConcept {
 
     private final String parentName;
     private final String name;
