@@ -29,7 +29,7 @@ public class CreateConcepts {
         UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
         userAccount.setRole("Admin");
         userAccount.setUserName("brian");
-        CreateConcept fn = new CreateConcept("behavior", "coding", userAccount);
+        CreateConcept fn = new CreateConcept("behavior", "Dario", userAccount);
         fn.apply(toolBelt);
 
     }
