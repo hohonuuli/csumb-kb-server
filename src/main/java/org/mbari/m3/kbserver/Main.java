@@ -6,6 +6,7 @@ import com.google.inject.spi.Toolable;
 
 import org.mbari.m3.kbserver.Initializer;
 import org.mbari.m3.kbserver.actions.CreateConcept;
+import org.mbari.m3.kbserver.actions.DeleteConcept;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -32,16 +33,25 @@ public class Main {
         UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
         userAccount.setRole("Admin");
         userAccount.setUserName("brian");
-        CreateConcept fn = new CreateConcept("behavior", "dariotesting123", userAccount);
+        //create concept
+        CreateConcept fn = new CreateConcept("behavior", "dariotesting!", userAccount);
         fn.apply(toolBelt);
         return "Concept has been created!";
  
        });
 
-	// delete("/deleteConcept", (request, response) -> {
-    
+	 delete("/deleteConcept", (request, response) -> {
+    	
+    	ToolBelt toolBelt = Initializer.getToolBelt();
+        // Need user. Normally we would look this up
+        UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+        userAccount.setRole("Admin");
+        userAccount.setUserName("brian");
+        DeleteConcept fn = new DeleteConcept("dariotesting!", userAccount);
+        fn.apply(toolBelt);
+        return "Concept has been Deleted!";
 
-	// });
+	 });
 
 	get("/hello", (req, res) -> "Hello World");
    	

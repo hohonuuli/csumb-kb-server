@@ -1,5 +1,6 @@
 org/mbari/m3/kbserver/Main.class
 org/mbari/m3/kbserver/Constants.class
+org/mbari/m3/kbserver/examples/DeleteConcepts.class
 org/mbari/m3/kbserver/examples/CreateConcepts.class
 org/mbari/m3/kbserver/actions/DeleteConcept.class
 org/mbari/m3/kbserver/actions/CreateConcept.class

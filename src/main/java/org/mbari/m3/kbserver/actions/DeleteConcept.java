@@ -31,11 +31,21 @@ public class DeleteConcept  {
         if (parentConcept != null) {
             HistoryFactory historyFactory = toolBelt.getHistoryFactory();
             History history = historyFactory.delete(userAccount, concept);
+
+            //this gave me an error
+            //concept.removeConceptName(concept.getConceptName(this.name));
+
+            //added this to see if removes concept(it didn't)
+            parentConcept.removeChildConcept(concept);
             parentConcept.getConceptMetadata().addHistory(history);
+
+            //added this to help fix error since this was present in create concept
+            dao.persist(history);
         }
         else {
             ok = false;
         }
+
         dao.endTransaction();
         dao.close();
         return ok;
