@@ -52,6 +52,10 @@ public class CreateConcept implements ApproveHistory {
             approve(userAccount, history, dao);
             dao.persist(history);
         }
+        else {
+            // TODO throws Exception? How to notify app that request was denied?
+            concept = null;
+        }
         dao.endTransaction();
         dao.close();
         return concept;
