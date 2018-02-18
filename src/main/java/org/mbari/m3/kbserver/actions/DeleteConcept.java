@@ -12,7 +12,7 @@ import vars.knowledgebase.ui.ToolBelt;
 /**
  * DeleteConcept
  */
-public class DeleteConcept implements CanDo {
+public class DeleteConcept implements ApproveHistory {
 
     private final String name;
     private final UserAccount userAccount;
@@ -33,9 +33,7 @@ public class DeleteConcept implements CanDo {
             HistoryFactory historyFactory = toolBelt.getHistoryFactory();
             History history = historyFactory.delete(userAccount, concept);
             if (canDo(userAccount, history)) {
-                history.setProcessedDate(new Date());
-                history.setProcessorName(userAccount.getUserName());
-                history.setApproved(Boolean.TRUE);
+                approve(userAccount, history, dao);
 
                 //this gave me an error
                 //concept.removeConceptName(concept.getConceptName(this.name));

@@ -12,7 +12,7 @@ import vars.knowledgebase.ui.ToolBelt;
 /**
  * CreateConcept
  */
-public class CreateConcept implements CanDo {
+public class CreateConcept implements ApproveHistory {
 
     private final String parentName;
     private final String name;
@@ -49,6 +49,7 @@ public class CreateConcept implements CanDo {
             dao.persist(concept);
             
             parentConcept.getConceptMetadata().addHistory(history);
+            approve(userAccount, history, dao);
             dao.persist(history);
         }
         dao.endTransaction();
