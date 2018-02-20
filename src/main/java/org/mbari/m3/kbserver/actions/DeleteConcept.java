@@ -38,7 +38,6 @@ public class DeleteConcept implements ApproveHistory {
                 //this gave me an error
                 //concept.removeConceptName(concept.getConceptName(this.name));
 
-                //added this to see if removes concept(it didn't)
                 parentConcept.getConceptMetadata().addHistory(history);
                 //added this to help fix error since this was present in create concept
                 dao.persist(history);

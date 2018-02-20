@@ -14,7 +14,7 @@ import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 
 /**
- * CreateConcepts
+ * DeleteConcepts
  */
 public class DeleteConcepts {
 
@@ -29,7 +29,7 @@ public class DeleteConcepts {
         UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
         userAccount.setRole("Admin");
         userAccount.setUserName("brian");
-        DeleteConcept fn = new DeleteConcept( "Dario", userAccount);
+        DeleteConcept fn = new DeleteConcept( "dariotesting", userAccount);
         fn.apply(toolBelt);
         System.out.println("Concept has been deleted!");
 
