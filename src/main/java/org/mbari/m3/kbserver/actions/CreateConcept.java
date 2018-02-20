@@ -12,7 +12,7 @@ import vars.knowledgebase.ui.ToolBelt;
 /**
  * CreateConcept
  */
-public class CreateConcept implements ApproveHistory {
+public class CreateConcept {
 
     private final String parentName;
     private final String name;
@@ -38,24 +38,16 @@ public class CreateConcept implements ApproveHistory {
         }
         KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
         Concept concept = knowledgebaseFactory.newConcept();
+        ConceptName conceptName = knowledgebaseFactory.newConceptName();
+        conceptName.setName(name);
+        conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
+        concept.addConceptName(conceptName);
+        concept.setOriginator(userAccount.getUserName());
+        parentConcept.addChildConcept(concept);
+        dao.persist(concept);
         History history = toolBelt.getHistoryFactory().add(userAccount, concept);
-        if (canDo(userAccount, history)) {
-            ConceptName conceptName = knowledgebaseFactory.newConceptName();
-            conceptName.setName(name);
-            conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
-            concept.addConceptName(conceptName);
-            concept.setOriginator(userAccount.getUserName());
-            parentConcept.addChildConcept(concept);
-            dao.persist(concept);
-            
-            parentConcept.getConceptMetadata().addHistory(history);
-            approve(userAccount, history, dao);
-            dao.persist(history);
-        }
-        else {
-            // TODO throws Exception? How to notify app that request was denied?
-            concept = null;
-        }
+        parentConcept.getConceptMetadata().addHistory(history);
+        dao.persist(history);
         dao.endTransaction();
         dao.close();
         return concept;
