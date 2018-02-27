@@ -24,11 +24,11 @@ import vars.knowledgebase.ui.ToolBelt;
 public class Main {
 
     public static void main(String[] args) {
-      
- 
+
+
 	//create a new concept
 	post("/createConcept/:name", (request, response) -> {
- 
+
          ToolBelt toolBelt = Initializer.getToolBelt();
         // Need user. Normally we would look this up
         UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
@@ -38,7 +38,7 @@ public class Main {
         //create concept
         CreateConcept fn = new CreateConcept("behavior", request.params(":name"), userAccount);
         response.type("application/json");
-        
+
         //checking to see if concept can be created and return json
         try
         {
@@ -51,26 +51,40 @@ public class Main {
         {
             return "{\"message\":\"concept not created\", \"code\": \"401\"}";
         }
- 
+
+       });
+
+       delete("/deleteConcept/:name", (request, response) -> {
+
+           ToolBelt toolBelt = Initializer.getToolBelt();
+           // Need user. Normally we would look this up
+           UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+           userAccount.setRole("Admin");
+           userAccount.setUserName("brian");
+
+           //create concept
+           DeleteConcept fn = new DeleteConcept(request.params(":name"), userAccount);
+
+           response.type("application/json");
+
+           //checking to see if concept can be created and return json
+           try
+           {
+               fn.apply(toolBelt);
+               return "{\"message\":\"Concept has been Deleted!\",\"code\": \"201\"}";
+
+
+           }
+           catch (Exception e)
+           {
+               return "{\"message\":\"concept not deleted\", \"code\": \"401\"}";
+           }
        });
 
 
-	 delete("/deleteConcept", (request, response) -> {
-    	
-    	ToolBelt toolBelt = Initializer.getToolBelt();
-        // Need user. Normally we would look this up
-        UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
-        userAccount.setRole("Admin");
-        userAccount.setUserName("brian");
-        DeleteConcept fn = new DeleteConcept("dariotesting!", userAccount);
-        fn.apply(toolBelt);
-        return "Concept has been Deleted!";
-
-	 });
-
 	get("/hello", (req, res) -> "Hello World");
-   	
-	get("/team",(req,res) -> "testing"); 
+
+	get("/team",(req,res) -> "testing");
 
 	}
 }
