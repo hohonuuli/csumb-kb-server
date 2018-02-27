@@ -7,6 +7,7 @@ import com.google.inject.spi.Toolable;
 import org.mbari.m3.kbserver.Initializer;
 import org.mbari.m3.kbserver.actions.CreateConcept;
 import org.mbari.m3.kbserver.actions.DeleteConcept;
+import org.mbari.m3.kbserver.actions.AddConceptName;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -26,19 +27,33 @@ public class Main {
       
  
 	//create a new concept
-	post("/createConcept", (request, response) -> {
+	post("/createConcept/:name", (request, response) -> {
  
          ToolBelt toolBelt = Initializer.getToolBelt();
         // Need user. Normally we would look this up
         UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
         userAccount.setRole("Admin");
         userAccount.setUserName("brian");
+
         //create concept
-        CreateConcept fn = new CreateConcept("behavior", "dariotesting!", userAccount);
-        fn.apply(toolBelt);
-        return "Concept has been created!";
+        CreateConcept fn = new CreateConcept("behavior", request.params(":name"), userAccount);
+        response.type("application/json");
+        
+        //checking to see if concept can be created and return json
+        try
+        {
+            fn.apply(toolBelt);
+            return "{\"message\":\"concept created\",\"code\": \"201\"}";
+
+
+        }
+        catch (Exception e)
+        {
+            return "{\"message\":\"concept not created\", \"code\": \"401\"}";
+        }
  
        });
+
 
 	 delete("/deleteConcept", (request, response) -> {
     	
