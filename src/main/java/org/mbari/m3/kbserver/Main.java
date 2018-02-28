@@ -55,6 +55,14 @@ public class Main {
        });
 
     //add synonym to a concept
+
+     //********************!!!!IMPORTANT!!!!!!!!!********************
+
+      //on the http endpoint, you need to add the type and concept name.
+      //Example:
+      //localhost:4567/addConceptName/dariomolina93?type=common&conceptName=dariotesting12333
+
+    //**********************************************************
     post("/addConceptName/:conceptApplyTo", (request, response) -> {
 
          ToolBelt toolBelt = Initializer.getToolBelt();
@@ -73,13 +81,6 @@ public class Main {
         AddConceptName fn = new AddConceptName(request.queryParams("conceptName"), request.params(":conceptApplyTo"), userAccount, request.queryParams("type") );
         response.type("application/json");
 
-        //********************!!!!IMPORTANT!!!!!!!!!********************
-
-        //on the http endpoint, you need to add the type and concept name.
-        //Example:
-            //localhost:4567/addConceptName/dariomolina93?type=common&conceptName=dariotesting12333
-
-        //**********************************************************
 
 
         //checking to see if concept can be created and return json
