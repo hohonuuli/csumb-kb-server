@@ -35,11 +35,12 @@ public class ConceptData
 	{
 		getAlternatives();
 		getMedia();
+		getDescriptors();
 		return jsonString;
 	}
 
 
-	public void getAlternatives()
+	private void getAlternatives()
 	{
 		Set<ConceptName> names = concept.getConceptNames();
 		jsonString += "\"alternatives\": [\n";
@@ -49,15 +50,15 @@ public class ConceptData
 		{
 			if(i == setSize -1)
 			{
-				jsonString += "{\n\"Type\" : \"" + s.getNameType() + "\",\n";
-				jsonString += "\"Name\" : \"" + s.getName() + "\"\n";
-				jsonString += "}\n";
+				jsonString += "\t{\n\t  \"Type\" : \"" + s.getNameType() + "\",\n";
+				jsonString += "\t  \"Name\" : \"" + s.getName() + "\"\n";
+				jsonString += "\t}\n";
 			}
 
 			else
 			{
-				jsonString += "{\n\"Type\" : \"" + s.getNameType() + "\",\n";
-				jsonString += "\"Name\" : \"" + s.getName() + "\"\n},\n";
+				jsonString += "\t{\n\t  \"Type\" : \"" + s.getNameType() + "\",\n";
+				jsonString += "\t  \"Name\" : \"" + s.getName() + "\"\n\t},\n";
 			}
 
 			i++;
@@ -69,7 +70,7 @@ public class ConceptData
 
 	}
 
-	public void getMedia()
+	private void getMedia()
 	{
 		Collection<Media> media = concept.getConceptMetadata().getMedias();
 		jsonString += "\n\"media\" : [";
@@ -80,21 +81,21 @@ public class ConceptData
 		{
 			if(i == setSize -1)
 			{
-				jsonString += "{\n\"url\" : \"" + s.getUrl() + "\",\n";
-				jsonString += "\"caption\" : \"" + s.getCaption() + "\",\n";
-				jsonString += "\"credit\" : \"" + s.getCredit() + "\",\n";
-				jsonString += "\"type\" : \"" + s.getType() + "\",\n";
-				jsonString += "\"isPrimary\" : \"" + s.isPrimary() + "\"\n";
-				jsonString += "}\n";
+				jsonString += "\n\t{\n\t  \"url\" : \"" + s.getUrl() + "\",\n";
+				jsonString += "\t  \"caption\" : \"" + s.getCaption() + "\",\n";
+				jsonString += "\t  \"credit\" : \"" + s.getCredit() + "\",\n";
+				jsonString += "\t  \"type\" : \"" + s.getType() + "\",\n";
+				jsonString += "\t  \"isPrimary\" : \"" + s.isPrimary() + "\"";
+				jsonString += "\n\t}\n";
 			}
 
 			else
 			{
-				jsonString += "{\n\"url\" : \"" + s.getUrl() + "\",\n";
-				jsonString += "\"caption\" : \"" + s.getCaption() + "\",\n";
-				jsonString += "\"credit\" : \"" + s.getCredit() + "\",\n";
-				jsonString += "\"type\" : \"" + s.getType() + "\",\n";
-				jsonString += "\"isPrimary\" : \"" + s.isPrimary() + "\",\n";
+				jsonString += "\n\t{\n\t  \"url\" : \"" + s.getUrl() + "\",\n";
+				jsonString += "\t  \"caption\" : \"" + s.getCaption() + "\",\n";
+				jsonString += "\t  \"credit\" : \"" + s.getCredit() + "\",\n";
+				jsonString += "\t  \"type\" : \"" + s.getType() + "\",\n";
+				jsonString += "\t  \"isPrimary\" : \"" + s.isPrimary() + "\"\n\t},";
 			}
 
 			i++;
@@ -108,17 +109,38 @@ public class ConceptData
 
 	}
 
-	public void getDescriptors()
+	private void getDescriptors()
 	{
 		Collection<LinkRealization> links = concept.getConceptMetadata().getLinkRealizations();
 
+		jsonString += "\n\"descriptors\" : [";
+		int setSize = links.size();
+		int i = 0;
+
 		for (LinkRealization s: links) 
 		{
-		  System.out.println("Value = " + s + '\n' +
-		  					"linkName: " + s.getLinkName() + '\n' +
-		  					"toConcept: " + s.getToConcept() + '\n' +
-		  					"linkValue: " + s.getLinkValue()+'\n');
+			if(i == setSize -1)
+			{
+
+				jsonString += "\n\t{\n\t  \"linkName\" : \"" + s.getLinkName() + "\",\n";
+				jsonString += "\t  \"toConcept\" : \"" + s.getToConcept() + "\",\n";
+				jsonString += "\t  \"linkValue\" : \"" + s.getLinkValue() + "\"";
+				jsonString += "\n\t}\n";
+				
+			}
+
+			else
+			{
+				jsonString += "\n\t{\n\t  \"linkName\" : \"" + s.getLinkName() + "\",\n";
+				jsonString += "\t  \"toConcept\" : \"" + s.getToConcept() + "\",\n";
+				jsonString += "\t  \"linkValue\" : \"" + s.getLinkValue() + "\"\n\t},";
+
+			}
+
+			i++;
 		}
+
+		jsonString += "    ]\n}";
 	}
 
 
