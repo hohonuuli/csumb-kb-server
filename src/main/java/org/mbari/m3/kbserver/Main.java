@@ -9,7 +9,6 @@ import org.mbari.m3.kbserver.actions.CreateConcept;
 import org.mbari.m3.kbserver.actions.DeleteConcept;
 import org.mbari.m3.kbserver.actions.AddConceptName;
 import org.mbari.m3.kbserver.actions.ConceptData;
-//import org.mbari.m3.kbserver.actions.JsonTransformer;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -109,16 +108,9 @@ public class Main {
         userAccount.setRole("Admin");
         userAccount.setUserName("brian");
 
-        //boolean f = (String.class.isInstance(request.queryParams("conceptName"))) ? true : false;
-
-
-        //String s = request.queryParams("conceptName") + " and " + request.queryParams("type");
-
-
         //create concept name
         AddConceptName fn = new AddConceptName(request.queryParams("conceptName"), request.params(":conceptApplyTo"), userAccount, request.queryParams("type") );
         response.type("application/json");
-
 
 
         //checking to see if concept can be created and return json
