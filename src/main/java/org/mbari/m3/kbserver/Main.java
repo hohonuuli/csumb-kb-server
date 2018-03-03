@@ -3,11 +3,13 @@ package org.mbari.m3.kbserver;
 import static spark.Spark.*;
 
 import com.google.inject.spi.Toolable;
-
+import com.google.gson.Gson;
 import org.mbari.m3.kbserver.Initializer;
 import org.mbari.m3.kbserver.actions.CreateConcept;
 import org.mbari.m3.kbserver.actions.DeleteConcept;
 import org.mbari.m3.kbserver.actions.AddConceptName;
+import org.mbari.m3.kbserver.actions.ConceptData;
+//import org.mbari.m3.kbserver.actions.JsonTransformer;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -44,6 +46,36 @@ public class Main {
         });
 
   before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
+
+
+// get("/hello", "application/json", (request, response) -> {
+//     return new MyMessage("Hello World");
+// }, new JsonTransformer());
+
+  //Gson gson = new Gson();
+  get("/getMetadata/:name", (request, response) -> {
+
+    ConceptData data = new ConceptData(request.params(":name"), Initializer.getToolBelt());
+    String[] names = {"james","dwight","tomas","meya"};
+    response.type("application/json");
+
+    String ls = "[";
+
+    for(int i = 0; i < names.length; i++)
+    {
+      if( i == names.length - 1)
+        ls += '\"'+ names[i] +"\"";
+
+      else
+        ls += '\"'+ names[i] +"\",";
+
+    }
+
+    ls += ']';
+
+    return "{\"names\" : " + ls + "}";
+
+  });
 
 	//create a new concept
 	post("/createConcept/:name", (request, response) -> {
