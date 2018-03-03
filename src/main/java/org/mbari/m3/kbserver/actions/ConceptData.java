@@ -140,7 +140,7 @@ public class ConceptData
 			i++;
 		}
 
-		jsonString += "    ]\n}";
+		jsonString += "]\n}";
 	}
 
 

@@ -48,17 +48,19 @@ public class Main {
   before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
 
-// get("/hello", "application/json", (request, response) -> {
-//     return new MyMessage("Hello World");
-// }, new JsonTransformer());
-
-  //Gson gson = new Gson();
   get("/getMetadata/:name", (request, response) -> {
 
-    ConceptData data = new ConceptData(request.params(":name"), Initializer.getToolBelt());
-    response.type("application/json");
+    try
+    {
+      ConceptData data = new ConceptData(request.params(":name"), Initializer.getToolBelt());
+      response.type("application/json");
 
-    return data.getMetadata();
+      return data.getMetadata();
+    }
+    catch(Exception e)
+    {
+      return "{\"message\" : \"" + e.getMessage() +"\", \"code\" : \"401\"}";
+    }
 
   });
 
@@ -85,7 +87,7 @@ public class Main {
         }
         catch (Exception e)
         {
-            return "{\"message\":\"concept not created\", \"code\": \"401\"}";
+            return "{\"message\":\""+ e.getMessage() + "\", \"code\": \"401\"}";
         }
 
        });
@@ -133,7 +135,7 @@ public class Main {
         }
         catch (Exception e)
         {
-            return "{\"message\":\"concept name not created\", \"code\": \"401\"}";
+            return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
         }
 
        });
@@ -161,7 +163,7 @@ public class Main {
            }
            catch (Exception e)
            {
-               return "{\"message\":\"concept not deleted\", \"code\": \"401\"}";
+               return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
            }
        });
 
