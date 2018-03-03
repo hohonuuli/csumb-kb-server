@@ -56,24 +56,9 @@ public class Main {
   get("/getMetadata/:name", (request, response) -> {
 
     ConceptData data = new ConceptData(request.params(":name"), Initializer.getToolBelt());
-    String[] names = {"james","dwight","tomas","meya"};
     response.type("application/json");
 
-    String ls = "[";
-
-    for(int i = 0; i < names.length; i++)
-    {
-      if( i == names.length - 1)
-        ls += '\"'+ names[i] +"\"";
-
-      else
-        ls += '\"'+ names[i] +"\",";
-
-    }
-
-    ls += ']';
-
-    return "{\"names\" : " + ls + "}";
+    return data.getMetadata();
 
   });
 

@@ -23,9 +23,10 @@ public class ConceptDatas
         ToolBelt toolBelt = Initializer.getToolBelt();
         
         ConceptData fn = new ConceptData("dab", toolBelt);
+        fn.getMetadata();
         //fn.getAlternatives();
         //fn.getMedia();
-        fn.getDescriptors();
+        //fn.getDescriptors();
     }
 
 }

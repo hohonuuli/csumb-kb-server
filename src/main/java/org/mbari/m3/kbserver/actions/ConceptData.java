@@ -16,6 +16,7 @@ public class ConceptData
 {
 	private Concept concept;
 	private ConceptDAO dao;
+	private String jsonString;
 
 
 	public ConceptData(String name, ToolBelt toolBelt)
@@ -25,33 +26,86 @@ public class ConceptData
 
         if (concept == null)
             throw new RuntimeException("Unable to find " + name);
+
+        jsonString = "{\n\"name\": \""+name +"\",\n";
         
+	}
+
+	public String getMetadata()
+	{
+		getAlternatives();
+		getMedia();
+		return jsonString;
 	}
 
 
 	public void getAlternatives()
 	{
 		Set<ConceptName> names = concept.getConceptNames();
-
+		jsonString += "\"alternatives\": [\n";
+		int setSize = names.size();
+		int i = 0;
 		for (ConceptName s: names) 
 		{
-		  System.out.println("Value = " + s + "  Type: " + s.getNameType() + "Name: " + s.getName());
+			if(i == setSize -1)
+			{
+				jsonString += "{\n\"Type\" : \"" + s.getNameType() + "\",\n";
+				jsonString += "\"Name\" : \"" + s.getName() + "\"\n";
+				jsonString += "}\n";
+			}
+
+			else
+			{
+				jsonString += "{\n\"Type\" : \"" + s.getNameType() + "\",\n";
+				jsonString += "\"Name\" : \"" + s.getName() + "\"\n},\n";
+			}
+
+			i++;
+		  //System.out.println("Value = " + s + "  Type: " + s.getNameType() + "Name: " + s.getName());
 		}
+
+		jsonString += "],";
+		System.out.println(jsonString);
 
 	}
 
 	public void getMedia()
 	{
 		Collection<Media> media = concept.getConceptMetadata().getMedias();
+		jsonString += "\n\"media\" : [";
+		int setSize = media.size();
+		int i = 0;
 
 		for (Media s : media) 
 		{
-        System.out.println("url: " + s.getUrl() + '\n' +
-        					"caption: " + s.getCaption() + '\n' + 
-        					"credit: " + s.getCredit() + '\n' +
-        					"type: " + s.getType() + '\n' +
-        					"isPrimary: " + s.isPrimary() + "\n\n");
+			if(i == setSize -1)
+			{
+				jsonString += "{\n\"url\" : \"" + s.getUrl() + "\",\n";
+				jsonString += "\"caption\" : \"" + s.getCaption() + "\",\n";
+				jsonString += "\"credit\" : \"" + s.getCredit() + "\",\n";
+				jsonString += "\"type\" : \"" + s.getType() + "\",\n";
+				jsonString += "\"isPrimary\" : \"" + s.isPrimary() + "\"\n";
+				jsonString += "}\n";
+			}
+
+			else
+			{
+				jsonString += "{\n\"url\" : \"" + s.getUrl() + "\",\n";
+				jsonString += "\"caption\" : \"" + s.getCaption() + "\",\n";
+				jsonString += "\"credit\" : \"" + s.getCredit() + "\",\n";
+				jsonString += "\"type\" : \"" + s.getType() + "\",\n";
+				jsonString += "\"isPrimary\" : \"" + s.isPrimary() + "\",\n";
+			}
+
+			i++;
+
         }
+
+        jsonString += "],";
+
+        System.out.println(jsonString);
+		//return jsonString;
+
 	}
 
 	public void getDescriptors()
