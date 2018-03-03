@@ -3,11 +3,12 @@ package org.mbari.m3.kbserver;
 import static spark.Spark.*;
 
 import com.google.inject.spi.Toolable;
-
+import com.google.gson.Gson;
 import org.mbari.m3.kbserver.Initializer;
 import org.mbari.m3.kbserver.actions.CreateConcept;
 import org.mbari.m3.kbserver.actions.DeleteConcept;
 import org.mbari.m3.kbserver.actions.AddConceptName;
+import org.mbari.m3.kbserver.actions.ConceptData;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -45,6 +46,23 @@ public class Main {
 
   before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
+
+  get("/getMetadata/:name", (request, response) -> {
+
+    try
+    {
+      ConceptData data = new ConceptData(request.params(":name"), Initializer.getToolBelt());
+      response.type("application/json");
+
+      return data.getMetadata();
+    }
+    catch(Exception e)
+    {
+      return "{\"message\" : \"" + e.getMessage() +"\", \"code\" : \"401\"}";
+    }
+
+  });
+
 	//create a new concept
 	post("/createConcept/:name", (request, response) -> {
 
@@ -68,7 +86,7 @@ public class Main {
         }
         catch (Exception e)
         {
-            return "{\"message\":\"concept not created\", \"code\": \"401\"}";
+            return "{\"message\":\""+ e.getMessage() + "\", \"code\": \"401\"}";
         }
 
        });
@@ -90,16 +108,9 @@ public class Main {
         userAccount.setRole("Admin");
         userAccount.setUserName("brian");
 
-        //boolean f = (String.class.isInstance(request.queryParams("conceptName"))) ? true : false;
-
-
-        //String s = request.queryParams("conceptName") + " and " + request.queryParams("type");
-
-
         //create concept name
         AddConceptName fn = new AddConceptName(request.queryParams("conceptName"), request.params(":conceptApplyTo"), userAccount, request.queryParams("type") );
         response.type("application/json");
-
 
 
         //checking to see if concept can be created and return json
@@ -116,7 +127,7 @@ public class Main {
         }
         catch (Exception e)
         {
-            return "{\"message\":\"concept name not created\", \"code\": \"401\"}";
+            return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
         }
 
        });
@@ -144,7 +155,7 @@ public class Main {
            }
            catch (Exception e)
            {
-               return "{\"message\":\"concept not deleted\", \"code\": \"401\"}";
+               return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
            }
        });
 
