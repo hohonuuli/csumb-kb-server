@@ -6,10 +6,8 @@ if [ $# -ne 1 ]; then
 fi
 
 if [ $1 = "main" ]; then
-	mvn compile
-	mvn exec:java -Dexec.mainClass=org.mbari.m3.kbserver.Main
+	mvn compile && mvn exec:java -Dexec.mainClass=org.mbari.m3.kbserver.Main
 
 else
-	mvn compile
-	mvn exec:java -Dexec.mainClass=org.mbari.m3.kbserver.examples.$1
+	mvn compile && mvn exec:java -Dexec.mainClass=org.mbari.m3.kbserver.examples.$1
 fi
