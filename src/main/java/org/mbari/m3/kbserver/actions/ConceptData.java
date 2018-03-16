@@ -39,6 +39,30 @@ public class ConceptData
 		return jsonString;
 	}
 
+	public void getHistory()
+	{
+
+		Collection<History> histories = concept.getConceptMetadata().getHistories();
+
+		System.out.println("BEFORE ITERATING THROUGH HISTORIES!!!!");
+		for(History s: histories)
+		{
+			System.out.println("Action is: " + s.getAction());
+			System.out.println("Processed date: " + s.getProcessedDate());
+			System.out.println("Processor name: " + s.getProcessorName());
+			System.out.println("Date created: " + s.getCreationDate());
+			System.out.println("Creator Name: " + s.getCreatorName());
+			System.out.println("getField(): " + s.getField());
+			System.out.println("getNewValue(): " + s.getNewValue());
+			System.out.println("getOldValue(): " + s.getOldValue()+ "\n\n");
+
+		}
+
+
+
+
+	}
+
 
 	private void getAlternatives()
 	{

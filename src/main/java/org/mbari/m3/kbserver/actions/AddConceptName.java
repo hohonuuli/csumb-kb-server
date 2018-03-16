@@ -6,6 +6,7 @@ import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
+import org.mbari.m3.kbserver.actions.ApproveHistory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 
@@ -26,7 +27,7 @@ public class AddConceptName
     }
 
 
-    public Concept apply(ToolBelt toolBelt)
+    public void apply(ToolBelt toolBelt)
     {
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
@@ -72,18 +73,22 @@ public class AddConceptName
         //setting who made the change
         concept.setOriginator(userAccount.getUserName());
 
-        //saving changes of concept
-        dao.persist(concept);
+        //newHistory(UserAccount userAccount, String action, String fieldName, String oldValue, String newValue)
 
-        //add to history the changes
-        History history = toolBelt.getHistoryFactory().add(userAccount, concept);
+         History history = toolBelt.getHistoryFactory().add(userAccount, conceptName);
+
+
+
+
+        if(new ApproveHistory(){}.approve(userAccount, history, dao))
+            dao.persist(concept);
        
-        //adding history to concept
+
         concept.getConceptMetadata().addHistory(history);
         dao.persist(history);
         dao.endTransaction();
         dao.close();
-        return concept;
+        return;
     }
 
 }

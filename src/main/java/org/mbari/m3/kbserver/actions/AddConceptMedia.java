@@ -6,6 +6,7 @@ import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.History;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.MediaTypes;
+import org.mbari.m3.kbserver.actions.ApproveHistory;
 import vars.knowledgebase.History;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
@@ -66,12 +67,15 @@ public class AddConceptMedia
          concept.getConceptMetadata().addMedia(media);
          concept.setOriginator(userAccount.getUserName());
 
-         //saving changes of concept
-         dao.persist(concept);
-
          //add to history the changes
-         History history = toolBelt.getHistoryFactory().add(userAccount, concept);
-       
+         History history = toolBelt.getHistoryFactory().add(userAccount, media);
+
+
+         //saving changes of concept
+         if(new ApproveHistory(){}.approve(userAccount, history, dao))
+            dao.persist(concept);
+
+               
          //adding history to concept
          concept.getConceptMetadata().addHistory(history);
          dao.persist(history);
