@@ -30,8 +30,8 @@ public class ChangeParents {
         UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
         userAccount.setRole("Admin");
         userAccount.setUserName("Dario");
-        ChangeParent fn = new ChangeParent("ACM", "dariotesting!", userAccount);
-        fn.apply(toolBelt);
+        ChangeParent fn = new ChangeParent("ACM", "dariotesting", userAccount);
+        //fn.apply(toolBelt);
 
     }
 

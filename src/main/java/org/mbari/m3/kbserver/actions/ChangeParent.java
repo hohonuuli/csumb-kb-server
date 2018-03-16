@@ -1,5 +1,7 @@
 package org.mbari.m3.kbserver.actions;
 
+import com.typesafe.config.ConfigException.Null;
+
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -24,7 +26,33 @@ public class ChangeParent {
         this.userAccount = userAccount;
     }
 
-    public Concept apply(ToolBelt toolBelt) {
+    public boolean isCircular(Concept thisConcept) {
+        return false;
+    }
+
+    // TODO: Get better identifyer for top of Phylogenic tree
+    // Currently getting name "object", could be used somewhere else.
+    public boolean isChildOfRootConcept(ToolBelt toolBelt, Concept concept) {
+        if (getParentName(toolBelt, concept).equals("object")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public String getParentName(ToolBelt toolBelt, Concept concept) {
+        ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        dao.startTransaction();
+
+        // Get the parent
+        if (concept.getParentConcept() == null) {
+            return "ChangeParent: Found object, parent was null";
+        }
+
+        return concept.getParentConcept().getPrimaryConceptName().getName();
+    }
+
+    public Concept apply(ToolBelt toolBelt) throws NullPointerException {
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
 
@@ -43,6 +71,17 @@ public class ChangeParent {
         if (currentParentConcept == null) {
             throw new RuntimeException("Unable to find " + existingConcept.getPrimaryConceptName().getName());
         }
+
+        // Verifying deletion
+
+        // Check if Concept is child of root node
+        if (this.isChildOfRootConcept(toolBelt, existingConcept)) {
+            System.out.println("Concept is direct child of root (object)");
+            return existingConcept;
+        }
+
+        // TODO: Check if Concept has a circular refernce
+        //
 
         // PARENT.removeChildConcept(existingConcept);
         currentParentConcept.removeChildConcept(existingConcept);
