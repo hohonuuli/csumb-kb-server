@@ -49,13 +49,13 @@ public class CreateConcept {
 
         History history = toolBelt.getHistoryFactory().add(userAccount, concept);
 
-        if(new CanDo(){}.canDo(userAccount, history))
+        if(new ApproveHistory(){}.approve(userAccount, history, dao))
+        {
             dao.persist(concept);
+            parentConcept.getConceptMetadata().addHistory(history);
+            dao.persist(history);
+        }
 
-
-
-        parentConcept.getConceptMetadata().addHistory(history);
-        dao.persist(history);
         dao.endTransaction();
         dao.close();
         return concept;

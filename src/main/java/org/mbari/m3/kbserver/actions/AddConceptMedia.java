@@ -72,17 +72,16 @@ public class AddConceptMedia
 
 
          //saving changes of concept
-         if(new ApproveHistory(){}.approve(userAccount, history, dao))
+        if(new ApproveHistory(){}.approve(userAccount, history, dao))
+        {
             dao.persist(concept);
+            concept.getConceptMetadata().addHistory(history);
+            dao.persist(history);
+        }
 
-               
-         //adding history to concept
-         concept.getConceptMetadata().addHistory(history);
-         dao.persist(history);
          dao.endTransaction();
          dao.close();
-
-        
+         return;
 	}
 
 }
