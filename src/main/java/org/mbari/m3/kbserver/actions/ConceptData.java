@@ -36,9 +36,9 @@ public class ConceptData
 		getAlternatives();
 		getMedia();
 		getDescriptors();
+		getHistory();
 		return jsonString;
 	}
-
 
 	private void getAlternatives()
 	{
@@ -104,7 +104,7 @@ public class ConceptData
 
         jsonString += "],";
 
-        System.out.println(jsonString);
+        //System.out.println(jsonString);
 		//return jsonString;
 
 	}
@@ -140,7 +140,55 @@ public class ConceptData
 			i++;
 		}
 
+
+		jsonString += "],";
+	}
+
+		public void getHistory()
+	{
+
+		Collection<History> histories = concept.getConceptMetadata().getHistories();
+		jsonString += "\n\"history\": [\n";
+		int setSize = histories.size();
+		int i = 0;
+
+		System.out.println("BEFORE ITERATING THROUGH HISTORIES!!!!");
+		for(History s: histories)
+		{
+
+			if(i == setSize - 1)
+			{
+				jsonString += "\t{\n\t  \"Action\" : \"" + s.getAction() + "\",\n";
+				jsonString += "\t  \"Processed_Date\" : \"" + s.getProcessedDate() + "\",\n";
+				jsonString += "\t  \"Processor_Name\" : \"" + s.getProcessorName() + "\",\n";
+				jsonString += "\t  \"Date_Created\" : \"" + s.getCreationDate() + "\",\n";
+				jsonString += "\t  \"Creator_Name\" : \"" + s.getCreatorName() + "\",\n";
+				jsonString += "\t  \"Field\" : \"" + s.getField() + "\",\n";
+				jsonString += "\t  \"New_Value\" : \"" + s.getNewValue()+ "\",\n";
+				jsonString += "\t  \"Previous_Value\" : \"" + s.getOldValue() + "\"\n";
+				jsonString += "\t}\n";
+			}
+
+			else
+			{
+				jsonString += "\t{\n\t  \"Action\" : \"" + s.getAction() + "\",\n";
+				jsonString += "\t  \"Processed_Date\" : \"" + s.getProcessedDate() + "\",\n";
+				jsonString += "\t  \"Processor_Name\" : \"" + s.getProcessorName() + "\",\n";
+				jsonString += "\t  \"Date_Created\" : \"" + s.getCreationDate() + "\",\n";
+				jsonString += "\t  \"Creator_Name\" : \"" + s.getCreatorName() + "\",\n";
+				jsonString += "\t  \"Field\" : \"" + s.getField() + "\",\n";
+				jsonString += "\t  \"New_Value\" : \"" + s.getNewValue()+ "\",\n";
+				jsonString += "\t  \"Previous_Value\" : \"" + s.getOldValue() + "\"\n\t},\n";
+			}
+
+			i++;
+
+
+		}
+
+
 		jsonString += "]\n}";
+
 	}
 
 

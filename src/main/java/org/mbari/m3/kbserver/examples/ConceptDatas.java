@@ -22,11 +22,12 @@ public class ConceptDatas
         System.out.println(">>>Concept data starting");
         ToolBelt toolBelt = Initializer.getToolBelt();
         
-        ConceptData fn = new ConceptData("dab", toolBelt);
-        fn.getMetadata();
+        ConceptData fn = new ConceptData("dariomolina12", toolBelt);
+        //fn.getMetadata();
         //fn.getAlternatives();
         //fn.getMedia();
         //fn.getDescriptors();
+        fn.getHistory();
     }
 
 }

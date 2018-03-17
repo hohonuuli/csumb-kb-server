@@ -9,7 +9,8 @@ import vars.knowledgebase.History;
 /**
  * RejectHistory
  */
-public interface RejectHistory extends CanDo {
+public interface RejectHistory extends CanDo 
+{
     
 
     default void reject(final UserAccount userAccount, History history, DAO dao) {
