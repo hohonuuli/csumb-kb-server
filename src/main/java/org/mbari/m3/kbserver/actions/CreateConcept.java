@@ -26,8 +26,8 @@ public class CreateConcept {
         this.userAccount = userAccount;
     }
 
-    public Concept apply(ToolBelt toolBelt) {
-
+    public boolean apply(ToolBelt toolBelt) {
+        boolean ok = true;
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
         Concept parentConcept = dao.findByName(parentName);
@@ -56,9 +56,12 @@ public class CreateConcept {
             dao.persist(history);
         }
 
+        else
+            ok = false;
+
         dao.endTransaction();
         dao.close();
-        return concept;
+        return ok;
     }
 
 

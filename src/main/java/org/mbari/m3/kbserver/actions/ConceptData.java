@@ -186,7 +186,6 @@ public class ConceptData
 
 		}
 
-
 		jsonString += "]\n}";
 
 	}

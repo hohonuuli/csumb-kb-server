@@ -28,21 +28,27 @@ public class DeleteConcept implements ApproveHistory {
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
         Concept concept = dao.findByName(name);
+
+        if(concept == null)
+            throw new RuntimeException("Unable to find " + name);
+
         Concept parentConcept = concept.getParentConcept();
         if (parentConcept != null) {
             HistoryFactory historyFactory = toolBelt.getHistoryFactory();
             History history = historyFactory.delete(userAccount, concept);
-            if (canDo(userAccount, history)) {
-                approve(userAccount, history, dao);
 
-                //this gave me an error
-                //concept.removeConceptName(concept.getConceptName(this.name));
-
+            if(new ApproveHistory(){}.approve(userAccount, history, dao))
+            {
                 parentConcept.getConceptMetadata().addHistory(history);
-                //added this to help fix error since this was present in create concept
                 dao.persist(history);
                 dao.cascadeRemove(concept);
             }
+
+            else
+                ok = false;
+
+
+            
 
         }
         else {

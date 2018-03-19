@@ -34,9 +34,10 @@ public class AddConceptMedia
         media = knowledgebaseFactory.newMedia();
 	}
 
-	public void apply(String url, String caption, String credit, String type, boolean primary)
+	public boolean apply(String url, String caption, String credit, String type, boolean primary)
 	{
 		//starting transaction and setting parameters for media object
+        boolean ok = true;
 		dao.startTransaction();
 		media.setUrl(url);
 		media.setCaption(caption);
@@ -78,10 +79,12 @@ public class AddConceptMedia
             concept.getConceptMetadata().addHistory(history);
             dao.persist(history);
         }
+        else
+            ok = false;
 
          dao.endTransaction();
          dao.close();
-         return;
+         return ok;
 	}
 
 }
