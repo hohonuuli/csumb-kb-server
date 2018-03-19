@@ -10,6 +10,9 @@ import org.mbari.m3.kbserver.actions.DeleteConcept;
 import org.mbari.m3.kbserver.actions.AddConceptName;
 import org.mbari.m3.kbserver.actions.AddConceptMedia;
 import org.mbari.m3.kbserver.actions.ConceptData;
+import vars.MiscDAOFactory;
+import org.mbari.m3.kbserver.actions.AddUserAccount;
+import vars.UserAccountDAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -71,9 +74,21 @@ public class Main {
 
          ToolBelt toolBelt = Initializer.getToolBelt();
         // Need user. Normally we would look this up
-        UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
-        userAccount.setRole("Admin");
-        userAccount.setUserName("brian");
+        // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+        // userAccount.setRole("Admin");
+        // userAccount.setUserName("brian");
+
+         if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+
 
         //create concept
         CreateConcept fn = new CreateConcept("behavior", request.params(":name"), userAccount);
@@ -82,9 +97,11 @@ public class Main {
         //checking to see if concept can be created and return json
         try
         {
-            fn.apply(toolBelt);
-            return "{\"message\":\"concept created\",\"code\": \"201\"}";
+            if(fn.apply(toolBelt))
+                  return "{\"message\":\"Concept has been created!\",\"code\": \"201\"}";
 
+               else
+                  return "{\"message\":\"Concept was not created! User is not admin.\",\"code\": \"401\"}";
 
         }
         catch (Exception e)
@@ -99,9 +116,19 @@ public class Main {
 
         ToolBelt toolBelt = Initializer.getToolBelt();
         // Need user. Normally we would look this up
-        UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
-        userAccount.setRole("Admin");
-        userAccount.setUserName("brian");
+        // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+        // userAccount.setRole("Admin");
+        // userAccount.setUserName("brian");
+
+        if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
 
         response.type("application/json");
 
@@ -110,12 +137,19 @@ public class Main {
         try
         {
             AddConceptMedia fn = new AddConceptMedia(request.params(":name"), toolBelt, userAccount);
-            fn.apply(request.queryParams("url"), request.queryParams("caption"),request.queryParams("credit"),request.queryParams("type"),Boolean.valueOf(request.queryParams("primary"))); 
+            if(fn.apply(request.queryParams("url"), request.queryParams("caption"),request.queryParams("credit"),request.queryParams("type"),Boolean.valueOf(request.queryParams("primary"))))
+            {
+              String s = "{\"message\":\"media added to concept\",\"code\": \"201\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            } 
+            else
+            {
+              String s = "{\"message\":\"media not added to concept. User is not admin.\",\"code\": \"401\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            }
 
-
-            String s = "{\"message\":\"media added to concept\",\"code\": \"201\",";
-            s += "\"type\":\""+ request.queryParams("type")+"\"}";
-            return s;
 
         }
         catch (Exception e)
@@ -138,9 +172,19 @@ public class Main {
 
          ToolBelt toolBelt = Initializer.getToolBelt();
         // Need user. Normally we would look this up
-        UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
-        userAccount.setRole("Admin");
-        userAccount.setUserName("brian");
+        // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+        // userAccount.setRole("Admin");
+        // userAccount.setUserName("brian");
+
+         if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
 
         //create concept name
         AddConceptName fn = new AddConceptName(request.queryParams("conceptName"), request.params(":conceptApplyTo"), userAccount, request.queryParams("type") );
@@ -150,12 +194,78 @@ public class Main {
         //checking to see if concept can be created and return json
         try
         {
-            fn.apply(toolBelt);
+            // fn.apply(toolBelt);
 
-            String s = "{\"message\":\"concept name added\",\"code\": \"201\",";
+            // String s = "{\"message\":\"concept name added\",\"code\": \"201\",";
 
-            s += "\"conceptName\":\""+ request.queryParams("conceptName")+"\",";
-            s += "\"type\":\""+ request.queryParams("type")+"\"}";
+            // s += "\"conceptName\":\""+ request.queryParams("conceptName")+"\",";
+            // s += "\"type\":\""+ request.queryParams("type")+"\"}";
+            // return s;
+
+          if(fn.apply(toolBelt))
+            {
+              String s = "{\"message\":\"concept name added\",\"code\": \"201\",";
+              s += "\"conceptName\":\""+ request.queryParams("conceptName")+"\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            } 
+            else
+            {
+              String s = "{\"message\":\"concept name not added! User is not admin.\",\"code\": \"401\",";
+              s += "\"conceptName\":\""+ request.queryParams("conceptName")+"\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            }
+
+        }
+        catch (Exception e)
+        {
+            return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+        }
+
+       });
+
+        post("/addUserAccount/:userName", (request, response) -> {
+
+         ToolBelt toolBelt = Initializer.getToolBelt();
+        // Need user. Normally we would look this up
+        // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+        // userAccount.setRole("Admin");
+        // userAccount.setUserName("brian");
+
+         if(request.params(":userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+         else if(request.queryParams("firstName") == null)
+            return "{\"message\":\"first name was not provided in endpoint\",\"code\": \"401\"}";
+
+         else if(request.queryParams("lastName") == null)
+            return "{\"message\":\"last name was not provided in endpoint\",\"code\": \"401\"}";
+         
+         else if(request.queryParams("password") == null)
+            return "{\"message\":\"password was not provided in endpoint\",\"code\": \"401\"}";
+
+          else if(request.queryParams("role") == null)
+            return "{\"message\":\"role name was not provided in endpoint\",\"code\": \"401\"}";
+
+          else if(request.queryParams("email") == null)
+            return "{\"message\":\"email was not provided in endpoint\",\"code\": \"401\"}";
+
+          else if(request.queryParams("affiliation") == null)
+            return "{\"message\":\"first name was not provided in endpoint\",\"code\": \"401\"}";
+
+         
+         AddUserAccount fn = new AddUserAccount(toolBelt);
+         response.type("application/json");
+        //String, userName, String firstName, String lastName,
+        //String password, String role, String email, String affiliation)
+
+         try
+        {
+            fn.apply(request.params(":userName"),request.queryParams("firstName"),request.queryParams("lasttName"),
+              request.queryParams("password"),request.queryParams("role"),request.queryParams("email"), request.queryParams("affiliation"));
+
+            String s = "{\"message\":\"user account with user name: '"+request.params(":userName")+"' was created.\",\"code\": \"201\",";
             return s;
 
         }
@@ -170,9 +280,19 @@ public class Main {
 
            ToolBelt toolBelt = Initializer.getToolBelt();
            // Need user. Normally we would look this up
-           UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
-           userAccount.setRole("Admin");
-           userAccount.setUserName("brian");
+           // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+           // userAccount.setRole("Admin");
+           // userAccount.setUserName("brian");
+
+          if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
 
            //create concept
            DeleteConcept fn = new DeleteConcept(request.params(":name"), userAccount);
@@ -182,9 +302,11 @@ public class Main {
            //checking to see if concept can be created and return json
            try
            {
-               fn.apply(toolBelt);
-               return "{\"message\":\"Concept has been Deleted!\",\"code\": \"201\"}";
+               if(fn.apply(toolBelt))
+                  return "{\"message\":\"Concept has been Deleted!\",\"code\": \"201\"}";
 
+               else
+                  return "{\"message\":\"Concept was not deleted! User is not admin.\",\"code\": \"401\"}";
 
            }
            catch (Exception e)
@@ -192,11 +314,13 @@ public class Main {
                return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
            }
        });
-
-
-	get("/hello", (req, res) -> "Hello World");
-
-	get("/team",(req,res) -> "testing");
-
 	}
+
+  public static UserAccount findUser(String userName)
+  {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+      UserAccountDAO userDao = toolBelt.getMiscDAOFactory().newUserAccountDAO();
+      return userDao.findByUserName(userName);
+
+  }
 }

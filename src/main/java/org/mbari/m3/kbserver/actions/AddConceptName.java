@@ -27,8 +27,9 @@ public class AddConceptName
     }
 
 
-    public void apply(ToolBelt toolBelt)
+    public boolean apply(ToolBelt toolBelt)
     {
+        boolean ok = true;
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
 
@@ -78,17 +79,19 @@ public class AddConceptName
          History history = toolBelt.getHistoryFactory().add(userAccount, conceptName);
 
 
-
-
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
+        {
             dao.persist(concept);
-       
+            concept.getConceptMetadata().addHistory(history);
+            dao.persist(history);
+        }
 
-        concept.getConceptMetadata().addHistory(history);
-        dao.persist(history);
+        else
+            ok = false;
+        
         dao.endTransaction();
         dao.close();
-        return;
+        return ok;
     }
 
 }
