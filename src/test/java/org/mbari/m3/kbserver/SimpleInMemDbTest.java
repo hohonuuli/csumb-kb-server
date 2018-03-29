@@ -10,7 +10,7 @@ import vars.knowledgebase.ui.ToolBelt;
 /**
  * Examples that use an in-memory derby database for testing. This allows you
  * to run unit tests with out running any external services.
- * 
+ *
  * @author Brian Schlining
  * @since 2018-03-29T15:30:00
  */
@@ -19,7 +19,7 @@ public class SimpleInMemDbTest {
     @Ignore
     @Test
     public void test() {
-        DatabaseLoader.load();
+        DatabaseLoader.load(); // load data in to database from a json file.
         KnowledgebaseDAOFactory daoFactory = Initializer.getToolBelt().getKnowledgebaseDAOFactory();
         ConceptDAO dao = daoFactory.newConceptDAO();
         Concept root = dao.findRoot();
