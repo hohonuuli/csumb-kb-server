@@ -45,12 +45,13 @@ public class CreateConcept {
         conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
         concept.addConceptName(conceptName);
         concept.setOriginator(userAccount.getUserName());
-        parentConcept.addChildConcept(concept);
+
 
         History history = toolBelt.getHistoryFactory().add(userAccount, concept);
 
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
         {
+            parentConcept.addChildConcept(concept);
             dao.persist(concept);
             parentConcept.getConceptMetadata().addHistory(history);
             dao.persist(history);

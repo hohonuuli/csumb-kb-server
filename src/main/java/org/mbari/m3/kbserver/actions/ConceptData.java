@@ -159,6 +159,7 @@ public class ConceptData
 			if(i == setSize - 1)
 			{
 				jsonString += "\t{\n\t  \"Action\" : \"" + s.getAction() + "\",\n";
+				jsonString += "\t  \"is_approved\" : \"" + s.isApproved() + "\",\n";
 				jsonString += "\t  \"Processed_Date\" : \"" + s.getProcessedDate() + "\",\n";
 				jsonString += "\t  \"Processor_Name\" : \"" + s.getProcessorName() + "\",\n";
 				jsonString += "\t  \"Date_Created\" : \"" + s.getCreationDate() + "\",\n";
@@ -172,6 +173,7 @@ public class ConceptData
 			else
 			{
 				jsonString += "\t{\n\t  \"Action\" : \"" + s.getAction() + "\",\n";
+				jsonString += "\t  \"is_approved\" : \"" + s.isApproved() + "\",\n";
 				jsonString += "\t  \"Processed_Date\" : \"" + s.getProcessedDate() + "\",\n";
 				jsonString += "\t  \"Processor_Name\" : \"" + s.getProcessorName() + "\",\n";
 				jsonString += "\t  \"Date_Created\" : \"" + s.getCreationDate() + "\",\n";
