@@ -16,7 +16,6 @@ import vars.knowledgebase.ui.ToolBelt;
  */
 public class SimpleInMemDbTest {
 
-    @Ignore
     @Test
     public void test() {
         DatabaseLoader.load(); // load data in to database from a json file.
