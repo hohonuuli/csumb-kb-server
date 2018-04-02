@@ -116,7 +116,8 @@ public class Main {
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
          if(request.queryParams("jwt") == null)
-            return "{\"message\":\"jwt token was not provided in endpoint\",\"code\": \"401\"}";
+            return "jwt is: " + request.queryParams("jwt");
+            //return "{\"message\":\"jwt token was not provided in endpoint\",\"code\": \"401\"}";
          
 
          UserAccount userAccount = findUser(request.queryParams("userName"));
@@ -129,7 +130,7 @@ public class Main {
         {
           JToken  jtoken = new JToken();
 
-          jtoken.verifyToken(request.queryParams("jwt"))
+          jtoken.verifyToken(request.queryParams("jwt"), userAccount);
 
 
 

@@ -49,17 +49,17 @@ public class JToken
 	}
 
 
-	public void verifyToken(String token)
+	public void verifyToken(String token, UserAccount user)
 	{
 
 		//String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCJ9.AbIJTDMFc7yUa5MhvcP03nJPyCPzZtQcGEp-zWfOkEE";
 		try 
 		{
-			//boolean admin = (user.isAdministrator()) ? true : false;
+			boolean admin = (user.isAdministrator()) ? true : false;
 		    Algorithm algorithm = Algorithm.HMAC256("secret");
 		    JWTVerifier verifier = JWT.require(algorithm)
-		    //.withIssuer(user.getUserName())
-		    //.withClaim("isAdmin", admin)
+		    .withIssuer(user.getUserName())
+		    .withClaim("isAdmin", admin)
 		    .build(); //Reusable verifier instance
 		    DecodedJWT jwt = verifier.verify(token);
 		} 

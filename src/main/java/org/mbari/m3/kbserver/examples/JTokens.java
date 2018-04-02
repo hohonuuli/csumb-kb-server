@@ -26,7 +26,7 @@ public class JTokens
 		System.out.println("Value: " + token);
 
 
-		jtoken.verifyToken(token);
+		//jtoken.verifyToken(token);
 	}
 
 	public static UserAccount findUser(String userName)
