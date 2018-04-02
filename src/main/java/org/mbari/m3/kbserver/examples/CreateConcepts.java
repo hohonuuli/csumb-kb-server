@@ -18,7 +18,7 @@ import vars.knowledgebase.ui.ToolBelt;
  */
 public class CreateConcepts {
 
-    public static void main(String[] args) {
+     {
         example1();
     }
 

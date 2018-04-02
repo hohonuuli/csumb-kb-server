@@ -12,6 +12,7 @@ import org.mbari.m3.kbserver.actions.AddConceptMedia;
 import org.mbari.m3.kbserver.actions.ConceptData;
 import vars.MiscDAOFactory;
 import org.mbari.m3.kbserver.actions.AddUserAccount;
+import org.mbari.m3.kbserver.actions.JToken;
 import vars.UserAccountDAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
@@ -50,6 +51,41 @@ public class Main {
 
   before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
+
+
+  post("/userLogin/:username", (request, response) -> {
+    
+    if(request.queryParams("password") == null || request.params(":username") == null)
+      return "{\"message\":\"username and/or password were not included in endpoint\",\"code\": \"401\"}";
+
+    
+
+     JToken jtoken = new JToken();
+
+     UserAccount userAccount = findUser(request.params(":username"));
+     response.type("application/json");
+
+    //return "{\"message\":\"token successfully created.\",\"jwt\": " + jtoken.createToken(userAccount) + ",\"code\": \"201\"}";
+
+    try
+    {
+      if(userAccount.authenticate(request.queryParams("password")))
+        return "{\"message\":\"token successfully created.\",\"jwt\": \"" + jtoken.createToken(userAccount) + "\",\"code\": \"201\"}";
+      
+      return "{\"message\":\"username and/or password are incorrect\",\"code\": \"401\"}";
+    }
+    
+    catch(Exception e)
+    {
+      return "{\"message\" : \"" + e.getMessage() +"\", \"code\" : \"401\"}";
+    }
+
+  });
+
+
+
+
+
   //getting information about concept(metadata)
   get("/getMetadata/:name", (request, response) -> {
 
@@ -67,8 +103,6 @@ public class Main {
 
   });
 
-
-
 	//create a new concept
 	post("/createConcept/:name", (request, response) -> {
 
@@ -81,12 +115,21 @@ public class Main {
          if(request.queryParams("userName") == null)
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
+         if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt token was not provided in endpoint\",\"code\": \"401\"}";
+         
 
          UserAccount userAccount = findUser(request.queryParams("userName"));
 
 
          if(userAccount == null)
             return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+          try
+        {
+          JToken  jtoken = new JToken();
+
+          jtoken.verifyToken(request.queryParams("jwt"))
 
 
 
@@ -95,13 +138,12 @@ public class Main {
         response.type("application/json");
 
         //checking to see if concept can be created and return json
-        try
-        {
-            if(fn.apply(toolBelt))
-                  return "{\"message\":\"Concept has been created!\",\"code\": \"201\"}";
+        
+        if(fn.apply(toolBelt))
+           return "{\"message\":\"Concept has been created!\",\"code\": \"201\"}";
 
-               else
-                  return "{\"message\":\"Concept was not created! User is not admin.\",\"code\": \"401\"}";
+        else
+           return "{\"message\":\"Concept was not created! User is not admin.\",\"code\": \"401\"}";
 
         }
         catch (Exception e)
@@ -265,7 +307,7 @@ public class Main {
             fn.apply(request.params(":userName"),request.queryParams("firstName"),request.queryParams("lasttName"),
               request.queryParams("password"),request.queryParams("role"),request.queryParams("email"), request.queryParams("affiliation"));
 
-            String s = "{\"message\":\"user account with user name: '"+request.params(":userName")+"' was created.\",\"code\": \"201\",";
+            String s = "{\"message\":\"user account with user name: '"+request.params(":userName")+"' was created.\",\"code\": \"201\"}";
             return s;
 
         }
