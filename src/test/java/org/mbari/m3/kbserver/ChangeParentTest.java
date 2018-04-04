@@ -75,6 +75,7 @@ public class ChangeParentTest
         assertTrue(changeParent.isChildOfRootConcept(toolBelt, concept));
     }
 
+    // Bad test, what if Beggiatoa doesn't exist? 
     public void testIsNotChildOfRootConcept() {
         changeParent = new ChangeParent("", "", userAccount);
         Concept concept = dao.findByName("Beggiatoa");

@@ -12,6 +12,7 @@ import org.mbari.m3.kbserver.actions.AddConceptMedia;
 import org.mbari.m3.kbserver.actions.ConceptData;
 import vars.MiscDAOFactory;
 import org.mbari.m3.kbserver.actions.AddUserAccount;
+import org.mbari.m3.kbserver.actions.ChangeParent;
 import org.mbari.m3.kbserver.actions.JToken;
 import vars.UserAccountDAO;
 import vars.UserAccount;
@@ -82,7 +83,51 @@ public class Main {
 
   });
 
+  post("/changeParent", (request, response) -> {
+    ToolBelt toolBelt = Initializer.getToolBelt();
 
+    if (request.queryParams("userName") == null) {
+      return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+    }
+    
+    if (request.queryParams("jwt") == null) {
+      return "jwt is: " + request.queryParams("jwt");
+    }
+
+    if (request.queryParams("newParent") == null) {
+      return "{\"message\":\"newParent was not provided in endpoint\",\"code\": \"401\"}";
+    }
+
+    if (request.queryParams("concept") == null) {
+      return "{\"message\":\"concept was not provided in endpoint\",\"code\": \"401\"}";
+    }
+    
+    UserAccount userAccount = findUser(request.queryParams("userName"));
+
+    if (userAccount == null) {
+      return "{\"message\":\"username not found\",\"code\": \"401\"}";
+    }
+
+    try {
+      JToken  jtoken = new JToken();
+      jtoken.verifyToken(request.queryParams("jwt"), userAccount);
+      
+      ChangeParent fn = new ChangeParent(request.queryParams("newParent"), request.queryParams("concept"), userAccount);
+      response.type("application/json");
+      
+      if (fn.apply(toolBelt)) {
+        return "{\"message\":\"Concept parent has been updated!\",\"code\": \"201\"}";
+      }
+
+      else {
+        return "{\"message\":\"Concept parent was NOT updated.\",\"code\": \"401\"}";
+      }
+    }
+
+    catch (Exception e) {
+        return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+    }
+  });
 
 
 
