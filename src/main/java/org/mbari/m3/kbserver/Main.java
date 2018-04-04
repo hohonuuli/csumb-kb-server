@@ -112,7 +112,7 @@ public class Main {
       // JToken  jtoken = new JToken();
       // jtoken.verifyToken(request.queryParams("jwt"), userAccount);
       
-      ChangeParent fn = new ChangeParent(request.params(":newParent"), request.params(":concept"), userAccount);
+      ChangeParent fn = new ChangeParent(request.queryParams("newParent"), request.queryParams("concept"), userAccount);
       response.type("application/json");
       
       if (fn.apply(toolBelt)) {
