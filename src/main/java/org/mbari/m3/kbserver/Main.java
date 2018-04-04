@@ -134,7 +134,7 @@ public class Main {
         {
           //JToken  jtoken = JToken.getInstance();
 
-          JToken.verifyToken(request.queryParams("jwt"));
+          JToken.verifyToken(request.queryParams("jwt"),userAccount);
 
 
 
@@ -187,7 +187,7 @@ public class Main {
         {
             //JToken  jtoken = new JToken();
 
-            JToken.verifyToken(request.queryParams("jwt"));
+            JToken.verifyToken(request.queryParams("jwt"),userAccount);
 
 
             AddConceptMedia fn = new AddConceptMedia(request.params(":name"), toolBelt, userAccount);
@@ -252,7 +252,7 @@ public class Main {
 
           //JToken  jtoken = new JToken();
 
-          JToken.verifyToken(request.queryParams("jwt"));
+          JToken.verifyToken(request.queryParams("jwt"),userAccount);
 
           AddConceptName fn = new AddConceptName(request.queryParams("conceptName"), request.params(":conceptApplyTo"), userAccount, request.queryParams("type") );
 
@@ -359,7 +359,7 @@ public class Main {
 
                 //JToken  jtoken = new JToken();
 
-               JToken.verifyToken(request.queryParams("jwt"));      
+               JToken.verifyToken(request.queryParams("jwt"),userAccount);      
 
                DeleteConcept fn = new DeleteConcept(request.params(":name"), userAccount); 
 
