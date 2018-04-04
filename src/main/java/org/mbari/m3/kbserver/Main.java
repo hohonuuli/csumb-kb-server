@@ -83,7 +83,7 @@ public class Main {
 
   });
 
-  post("/changeParent/:concept/:newParent", (request, response) -> {
+  post("/changeParent", (request, response) -> {
     ToolBelt toolBelt = Initializer.getToolBelt();
 
     if (request.queryParams("userName") == null) {
@@ -93,6 +93,14 @@ public class Main {
     if (request.queryParams("jwt") == null) {
       return "jwt is: " + request.queryParams("jwt");
     }
+
+    if (request.queryParams("newParent") == null) {
+      return "{\"message\":\"newParent was not provided in endpoint\",\"code\": \"401\"}";
+    }
+
+    if (request.queryParams("concept") == null) {
+      return "{\"message\":\"concept was not provided in endpoint\",\"code\": \"401\"}";
+    }
     
     UserAccount userAccount = findUser(request.queryParams("userName"));
 
@@ -101,8 +109,8 @@ public class Main {
     }
 
     try {
-      JToken  jtoken = new JToken();
-      jtoken.verifyToken(request.queryParams("jwt"), userAccount);
+      // JToken  jtoken = new JToken();
+      // jtoken.verifyToken(request.queryParams("jwt"), userAccount);
       
       ChangeParent fn = new ChangeParent(request.params(":newParent"), request.params(":concept"), userAccount);
       response.type("application/json");
