@@ -20,10 +20,10 @@ public class JTokens
 
 		UserAccount userAccount = findUser("testffing");
 
-		JToken jtoken = new JToken();
-		String token = jtoken.createToken(userAccount);
+		//JToken jtoken = new JToken();
+		//String token = jtoken.createToken(userAccount);
 
-		System.out.println("Value: " + token);
+		System.out.println("Value: ");
 
 
 		//jtoken.verifyToken(token);

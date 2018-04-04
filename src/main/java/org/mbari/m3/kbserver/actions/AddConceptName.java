@@ -68,19 +68,18 @@ public class AddConceptName
 
         }
         
-        //adding the concept name to concept
-        concept.addConceptName(conceptName);
-
-        //setting who made the change
-        concept.setOriginator(userAccount.getUserName());
-
-        //newHistory(UserAccount userAccount, String action, String fieldName, String oldValue, String newValue)
-
+        
          History history = toolBelt.getHistoryFactory().add(userAccount, conceptName);
 
 
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
         {
+
+            //adding the concept name to concept
+            concept.addConceptName(conceptName);
+
+            //setting who made the change
+            concept.setOriginator(userAccount.getUserName());
             dao.persist(concept);
             concept.getConceptMetadata().addHistory(history);
             dao.persist(history);
