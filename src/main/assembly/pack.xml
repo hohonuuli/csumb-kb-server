@@ -4,7 +4,7 @@
         Maven assembly descriptor for building a standalone app structure
 -->
 <assembly>
-    <id>scripting</id>
+    <id>pack</id>
     <formats>
         <format>zip</format>
     </formats>

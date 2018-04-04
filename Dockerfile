@@ -1,13 +1,17 @@
-FROM maven:3-jdk-8
+FROM openjdk:8-jre
 
-LABEL maintainer="Brian Schiling"
+LABEL maintainer="Brian Schlining <brian@mbari.org>"
 
-Env APP_HOME /opt/kbserver
+RUN mkdir -p /opt/kbserver
 
-COPY . ${APP_HOME}
+COPY target/csumb-kb-server-*-pack.zip /opt
 
-WORKDIR ${APP_HOME}
+WORKDIR /opt
+
+RUN unzip *.zip -d /opt/kbserver && \
+    rm *.zip && \
+    chmod a+x /opt/kbserver/bin/main.sh
 
 EXPOSE 4567
 
-ENTRYPOINT ["./run.sh","main"] 
+CMD ["/opt/kbserver/bin/main.sh"]

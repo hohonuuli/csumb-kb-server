@@ -52,7 +52,7 @@ public class ChangeParent {
         return concept.getParentConcept().getPrimaryConceptName().getName();
     }
 
-    public Concept apply(ToolBelt toolBelt) throws NullPointerException {
+    public boolean apply(ToolBelt toolBelt) throws NullPointerException {
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
 
@@ -77,7 +77,7 @@ public class ChangeParent {
         // Check if Concept is child of root node
         if (this.isChildOfRootConcept(toolBelt, existingConcept)) {
             System.out.println("Concept is direct child of root (object)");
-            return existingConcept;
+            return false;
         }
 
         // TODO: Check if Concept has a circular refernce
@@ -96,6 +96,6 @@ public class ChangeParent {
         dao.persist(history);
         dao.endTransaction();
         dao.close();
-        return existingConcept;
+        return true;
     }
 }
