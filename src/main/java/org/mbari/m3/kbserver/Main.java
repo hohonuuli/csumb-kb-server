@@ -109,8 +109,8 @@ public class Main {
     }
 
     try {
-      // JToken  jtoken = new JToken();
-      // jtoken.verifyToken(request.queryParams("jwt"), userAccount);
+      JToken  jtoken = new JToken();
+      jtoken.verifyToken(request.queryParams("jwt"), userAccount);
       
       ChangeParent fn = new ChangeParent(request.queryParams("newParent"), request.queryParams("concept"), userAccount);
       response.type("application/json");
