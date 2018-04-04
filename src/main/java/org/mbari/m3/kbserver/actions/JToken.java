@@ -41,7 +41,7 @@ public class JToken
 		{
 
 			Date targetTime = new Date(); 
-			targetTime = DateUtils.addMinutes(targetTime, 2);
+			targetTime = DateUtils.addMinutes(targetTime, 60);
 			boolean admin = (user.isAdministrator()) ? true : false;
 			Algorithm algorithm = Algorithm.HMAC256("secret");
 	    	String token = JWT.create()
@@ -92,32 +92,6 @@ public class JToken
 
 	}
 
-
-	public static String destroyToken(String token)
-	{
-		return token += randomString();
-	}
-
-	public static String randomString()
-	{
-	    String caps = "ABCDEFGHIJKLMNOPQRSTUVXWXYZ";
-	    caps += caps.toLowerCase();
-	    caps += "0123456789";
-	    
-	    String randString = "";
-	    
-	    for(int i = 0; i < 4; i++)
-	    {
-	      
-	      Random rand = new Random();
-	      int  n = rand.nextInt(caps.length() - 1) + 0;
-	      
-	      randString += caps.charAt(n);
-	      
-	    }
-	    
-	    return randString;
-	 }
 
 }
 
