@@ -1,0 +1,62 @@
+package org.mbari.m3.kbserver;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+import org.mbari.m3.kbserver.actions.DeleteConcept;
+import org.mbari.m3.kbserver.actions.CreateConcept;
+
+import vars.UserAccount;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.History;
+import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.ui.ToolBelt;
+
+
+/**
+ * Unit test for simple App.
+ */
+public class DeleteConceptTest {
+    ToolBelt toolBelt;
+    UserAccount userAccount;
+    ConceptDAO dao;
+    DeleteConcept deleteConcept;
+
+    /**
+     * Create the test case
+     *
+     * @param testName name of the test case
+     */
+    public DeleteConceptTest() {
+        toolBelt = Initializer.getToolBelt();
+        userAccount = toolBelt.getMiscFactory().newUserAccount();
+        userAccount.setRole("Admin");
+        userAccount.setUserName("Lucas");
+        dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        dao.startTransaction();
+    }
+
+    @Test 
+    public void testApply() {
+        // Create new concept
+        CreateConcept fn = new CreateConcept("object", "testConcept", userAccount);
+        fn.apply(toolBelt);
+
+        // Verify parent is changed
+        Concept newConcept;
+        boolean isChanged;
+
+        try {
+            newConcept = dao.findByName("testConcept");
+            deleteConcept = new DeleteConcept("testConcept", userAccount);
+            assertTrue(deleteConcept.apply(toolBelt));
+        }
+        catch (Exception e) {
+            assertTrue(false);
+        }
+    }
+}

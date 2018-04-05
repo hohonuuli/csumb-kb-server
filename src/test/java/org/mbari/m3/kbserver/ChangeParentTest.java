@@ -1,10 +1,12 @@
 package org.mbari.m3.kbserver;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import org.mbari.m3.kbserver.actions.ChangeParent;
 import org.mbari.m3.kbserver.actions.CreateConcept;
+import org.mbari.m3.kbserver.actions.DeleteConcept;
 
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
@@ -19,9 +21,7 @@ import vars.knowledgebase.ui.ToolBelt;
 /**
  * Unit test for simple App.
  */
-public class ChangeParentTest 
-    extends TestCase
-{
+public class ChangeParentTest {
     ToolBelt toolBelt;
     UserAccount userAccount;
     ConceptDAO dao;
@@ -32,10 +32,7 @@ public class ChangeParentTest
      *
      * @param testName name of the test case
      */
-    public ChangeParentTest( String testName )
-    {
-        super( testName );
-
+    public ChangeParentTest() {
         toolBelt = Initializer.getToolBelt();
         userAccount = toolBelt.getMiscFactory().newUserAccount();
         userAccount.setRole("Admin");
@@ -44,14 +41,7 @@ public class ChangeParentTest
         dao.startTransaction();
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( ChangeParentTest.class );
-    }
-
+    @Test
     public void testGetParentNull() {
         // TODO: Create object, test child of Object.
         changeParent = new ChangeParent("", "", userAccount);
@@ -60,6 +50,7 @@ public class ChangeParentTest
         assertEquals(changeParent.getParentName(toolBelt, thisConcept), "ChangeParent: Found object, parent was null");
     }
 
+    @Test
     public void testGetParentNameIsObject() {
         // TODO: Create object, test child of Object.
         changeParent = new ChangeParent("", "", userAccount);
@@ -68,6 +59,7 @@ public class ChangeParentTest
         assertEquals(changeParent.getParentName(toolBelt, thisConcept).toLowerCase(), "object");
     }
 
+    @Test
     public void testIsChildOfRootConcept() {
         changeParent = new ChangeParent("", "", userAccount);
         Concept concept = dao.findByName("behavior");
@@ -75,6 +67,7 @@ public class ChangeParentTest
         assertTrue(changeParent.isChildOfRootConcept(toolBelt, concept));
     }
 
+    @Test
     // Bad test, what if Beggiatoa doesn't exist? 
     public void testIsNotChildOfRootConcept() {
         changeParent = new ChangeParent("", "", userAccount);
@@ -83,10 +76,16 @@ public class ChangeParentTest
         assertFalse(changeParent.isChildOfRootConcept(toolBelt, concept));
     }
 
+    @Test
     public void testApply() {
         // Create new concept
-        CreateConcept fn = new CreateConcept("behavior", "ChangeParentTestCase", userAccount);
-        fn.apply(toolBelt);
+        try {
+            CreateConcept fn = new CreateConcept("behavior", "ChangeParentTestCase", userAccount);
+            fn.apply(toolBelt);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
 
         // Set the parent
         // Is set to behavior
