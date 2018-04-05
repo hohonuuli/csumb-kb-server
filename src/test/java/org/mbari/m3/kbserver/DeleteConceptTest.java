@@ -21,6 +21,8 @@ import vars.knowledgebase.ui.ToolBelt;
  * Unit test for simple App.
  */
 public class DeleteConceptTest {
+    private static String NEW_CONCEPT_NAME = "testConcept";
+
     ToolBelt toolBelt;
     UserAccount userAccount;
     ConceptDAO dao;
@@ -43,7 +45,7 @@ public class DeleteConceptTest {
     @Test 
     public void testApply() {
         // Create new concept
-        CreateConcept fn = new CreateConcept("object", "testConcept", userAccount);
+        CreateConcept fn = new CreateConcept("object", NEW_CONCEPT_NAME, userAccount);
         fn.apply(toolBelt);
 
         // Verify parent is changed
@@ -51,8 +53,8 @@ public class DeleteConceptTest {
         boolean isChanged;
 
         try {
-            newConcept = dao.findByName("testConcept");
-            deleteConcept = new DeleteConcept("testConcept", userAccount);
+            newConcept = dao.findByName(NEW_CONCEPT_NAME);
+            deleteConcept = new DeleteConcept(NEW_CONCEPT_NAME, userAccount);
             assertTrue(deleteConcept.apply(toolBelt));
         }
         catch (Exception e) {

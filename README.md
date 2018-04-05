@@ -12,7 +12,6 @@
 * addUserAccount
 * deleteConcept
 
-
 ## Start up
 
 1. Clone [vars-kb](http://github.com/mbari-media-managment/vars-kb)
