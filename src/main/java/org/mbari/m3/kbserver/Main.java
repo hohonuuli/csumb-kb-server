@@ -61,9 +61,13 @@ public class Main {
 
     
 
-     JToken jtoken = new JToken();
+     JToken jtoken = JToken.getInstance();
 
      UserAccount userAccount = findUser(request.params(":username"));
+
+     if(userAccount == null)
+        return "{\"message\":\" username does not exist\",\"code\": \"401\"}";
+
      response.type("application/json");
 
     //return "{\"message\":\"token successfully created.\",\"jwt\": " + jtoken.createToken(userAccount) + ",\"code\": \"201\"}";
@@ -109,8 +113,8 @@ public class Main {
     }
 
     try {
-      JToken  jtoken = new JToken();
-      jtoken.verifyToken(request.queryParams("jwt"), userAccount);
+
+      JToken.verifyToken(request.queryParams("jwt"), userAccount);
       
       ChangeParent fn = new ChangeParent(request.queryParams("newParent"), request.queryParams("concept"), userAccount);
       response.type("application/json");
@@ -161,7 +165,7 @@ public class Main {
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
          if(request.queryParams("jwt") == null)
-            return "jwt is: " + request.queryParams("jwt");
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
             //return "{\"message\":\"jwt token was not provided in endpoint\",\"code\": \"401\"}";
          
 
@@ -173,9 +177,9 @@ public class Main {
 
           try
         {
-          JToken  jtoken = new JToken();
+          //JToken  jtoken = JToken.getInstance();
 
-          jtoken.verifyToken(request.queryParams("jwt"), userAccount);
+          JToken.verifyToken(request.queryParams("jwt"),userAccount);
 
 
 
@@ -211,6 +215,8 @@ public class Main {
         if(request.queryParams("userName") == null)
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
+        if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
 
          UserAccount userAccount = findUser(request.queryParams("userName"));
 
@@ -224,6 +230,11 @@ public class Main {
         //checking to see if concept can be created and return json
         try
         {
+            //JToken  jtoken = new JToken();
+
+            JToken.verifyToken(request.queryParams("jwt"),userAccount);
+
+
             AddConceptMedia fn = new AddConceptMedia(request.params(":name"), toolBelt, userAccount);
             if(fn.apply(request.queryParams("url"), request.queryParams("caption"),request.queryParams("credit"),request.queryParams("type"),Boolean.valueOf(request.queryParams("primary"))))
             {
@@ -268,27 +279,27 @@ public class Main {
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
 
+         if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+        
          UserAccount userAccount = findUser(request.queryParams("userName"));
 
 
          if(userAccount == null)
             return "{\"message\":\"username not found\",\"code\": \"401\"}";
 
-        //create concept name
-        AddConceptName fn = new AddConceptName(request.queryParams("conceptName"), request.params(":conceptApplyTo"), userAccount, request.queryParams("type") );
+    
+        //specifying response type
         response.type("application/json");
 
-
-        //checking to see if concept can be created and return json
         try
         {
-            // fn.apply(toolBelt);
 
-            // String s = "{\"message\":\"concept name added\",\"code\": \"201\",";
+          //JToken  jtoken = new JToken();
 
-            // s += "\"conceptName\":\""+ request.queryParams("conceptName")+"\",";
-            // s += "\"type\":\""+ request.queryParams("type")+"\"}";
-            // return s;
+          JToken.verifyToken(request.queryParams("jwt"),userAccount);
+
+          AddConceptName fn = new AddConceptName(request.queryParams("conceptName"), request.params(":conceptApplyTo"), userAccount, request.queryParams("type") );
 
           if(fn.apply(toolBelt))
             {
@@ -375,6 +386,8 @@ public class Main {
           if(request.queryParams("userName") == null)
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
+          if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
 
          UserAccount userAccount = findUser(request.queryParams("userName"));
 
@@ -382,14 +395,19 @@ public class Main {
          if(userAccount == null)
             return "{\"message\":\"username not found\",\"code\": \"401\"}";
 
-           //create concept
-           DeleteConcept fn = new DeleteConcept(request.params(":name"), userAccount);
 
            response.type("application/json");
 
            //checking to see if concept can be created and return json
            try
            {
+
+                //JToken  jtoken = new JToken();
+
+               JToken.verifyToken(request.queryParams("jwt"),userAccount);      
+
+               DeleteConcept fn = new DeleteConcept(request.params(":name"), userAccount); 
+
                if(fn.apply(toolBelt))
                   return "{\"message\":\"Concept has been Deleted!\",\"code\": \"201\"}";
 

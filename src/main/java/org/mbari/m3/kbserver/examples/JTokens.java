@@ -18,12 +18,17 @@ public class JTokens
 	public static void main(String[] args)
 	{
 
-		UserAccount userAccount = findUser("testffing");
+		UserAccount userAccount = findUser("testing");
 
-		JToken jtoken = new JToken();
+		JToken jtoken = JToken.getInstance();
+
+		//JToken jtoken = new JToken();
 		String token = jtoken.createToken(userAccount);
 
-		System.out.println("Value: " + token);
+
+		//DecodedJWT jwt = jtoken.verifyToken(token);
+
+		//System.out.println("Expiration time: " + jwt.getExpiresAt());
 
 
 		//jtoken.verifyToken(token);
