@@ -17,10 +17,6 @@ import vars.knowledgebase.History;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 
-
-/**
- * Unit test for simple App.
- */
 public class ChangeParentTest {
     static final String NEW_CONCEPT_NAME = "ChangeParentTestCase";
     static final String ORIGINAL_PARENT = "behavior";
@@ -31,11 +27,6 @@ public class ChangeParentTest {
     ConceptDAO dao;
     ChangeParent changeParent;
 
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
     public ChangeParentTest() {
         toolBelt = Initializer.getToolBelt();
         userAccount = toolBelt.getMiscFactory().newUserAccount();
@@ -109,11 +100,15 @@ public class ChangeParentTest {
         }
 
         // TODO: Verify old parent doesn't have association
-        //
 
         // Delete concept
-        //
-
+        try {
+            DeleteConcept deleteConcept = new DeleteConcept(NEW_CONCEPT_NAME, userAccount);
+            deleteConcept.apply(toolBelt);
+        } catch (Exception e) {
+            System.out.println(e + "\nConcept already cleaned up?");
+        }
+        
         assertTrue(isChanged);
     }
 }

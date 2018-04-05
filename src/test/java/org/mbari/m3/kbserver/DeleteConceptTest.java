@@ -16,10 +16,6 @@ import vars.knowledgebase.History;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 
-
-/**
- * Unit test for simple App.
- */
 public class DeleteConceptTest {
     private static String NEW_CONCEPT_NAME = "testConcept";
 
@@ -28,11 +24,6 @@ public class DeleteConceptTest {
     ConceptDAO dao;
     DeleteConcept deleteConcept;
 
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
     public DeleteConceptTest() {
         toolBelt = Initializer.getToolBelt();
         userAccount = toolBelt.getMiscFactory().newUserAccount();
@@ -49,11 +40,8 @@ public class DeleteConceptTest {
         fn.apply(toolBelt);
 
         // Verify parent is changed
-        Concept newConcept;
-        boolean isChanged;
-
         try {
-            newConcept = dao.findByName(NEW_CONCEPT_NAME);
+            Concept newConcept = dao.findByName(NEW_CONCEPT_NAME);
             deleteConcept = new DeleteConcept(NEW_CONCEPT_NAME, userAccount);
             assertTrue(deleteConcept.apply(toolBelt));
         }
