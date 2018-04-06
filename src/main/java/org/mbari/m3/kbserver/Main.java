@@ -8,6 +8,7 @@ import org.mbari.m3.kbserver.Initializer;
 import org.mbari.m3.kbserver.actions.CreateConcept;
 import org.mbari.m3.kbserver.actions.DeleteConcept;
 import org.mbari.m3.kbserver.actions.AddConceptName;
+import org.mbari.m3.kbserver.actions.UpdateConceptName;
 import org.mbari.m3.kbserver.actions.AddConceptMedia;
 import org.mbari.m3.kbserver.actions.ConceptData;
 import vars.MiscDAOFactory;
@@ -275,9 +276,17 @@ public class Main {
         // userAccount.setRole("Admin");
         // userAccount.setUserName("brian");
 
+         if(request.params(":conceptApplyTo") == null)
+            return "{\"message\":\"concept to apply to was not provided in endpoint\",\"code\": \"401\"}";
+
+         if(request.queryParams("conceptName") == null)
+            return "{\"message\":\"conceptName was not provided in endpoint\",\"code\": \"401\"}";
+
          if(request.queryParams("userName") == null)
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
+          if(request.queryParams("type") == null)
+            return "{\"message\":\"type was not provided in endpoint\",\"code\": \"401\"}";
 
          if(request.queryParams("jwt") == null)
             return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
@@ -323,6 +332,83 @@ public class Main {
         }
 
        });
+
+
+      post("/updateConceptName/:concept", (request, response) -> {
+
+          ToolBelt toolBelt = Initializer.getToolBelt();
+              // Need user. Normally we would look this up
+              // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+              // userAccount.setRole("Admin");
+              // userAccount.setUserName("brian");
+
+          if(request.params(":concept") == null)
+            return "{\"message\":\"concept to apply to was not provided in endpoint\",\"code\": \"401\"}";
+
+         if(request.queryParams("newConceptName") == null)
+            return "{\"message\":\"conceptName was not provided in endpoint\",\"code\": \"401\"}";
+
+          if(request.queryParams("oldConceptName") == null)
+            return "{\"message\":\"oldConceptName was not provided in endpoint\",\"code\": \"401\"}";
+
+         if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+          if(request.queryParams("type") == null)
+            return "{\"message\":\"type was not provided in endpoint\",\"code\": \"401\"}";
+
+         if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+              
+          UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+               if(userAccount == null)
+                  return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+          
+              //specifying response type
+              response.type("application/json");
+
+              try
+              {
+
+                //JToken  jtoken = new JToken();
+
+                JToken.verifyToken(request.queryParams("jwt"),userAccount);
+
+                //public UpdateConceptName(String newConceptName, String conceptApplyTo, UserAccount userAccount, String type) 
+                UpdateConceptName fn = new UpdateConceptName(request.queryParams("newConceptName"), request.queryParams("oldConceptName"), userAccount, request.queryParams("type"),request.params(":concept"));
+
+                if(fn.apply(toolBelt))
+                  {
+                    String s = "{\"message\":\"concept name was updated!\",\"code\": \"201\",";
+                    s += "\"newConceptName\":\""+ request.queryParams("newConceptName")+"\",";
+                    s += "\"oldConceptName\":\""+ request.params(":oldConceptName")+"\",";
+                    s += "\"type\":\""+ request.queryParams("type")+"\",";
+                    s += "\"code\": \"201\"}";
+                    return s;
+                  } 
+                  else
+                  {
+                    String s = "{\"message\":\"concept name not updated! User is not admin.\",\"code\": \"401\",";
+                    s += "\"newConceptName\":\""+ request.queryParams("newConceptName")+"\",";
+                    s += "\"oldConceptName\":\""+ request.params(":oldConceptName")+"\",";
+                    s += "\"type\":\""+ request.queryParams("type")+"\",";
+                    s += "\"code\": \"401\"}";
+                    return s;
+                  }
+
+              }
+              catch (Exception e)
+              {
+                  return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+              }
+
+             });
+
+
+
 
         post("/addUserAccount/:userName", (request, response) -> {
 
