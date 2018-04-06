@@ -84,6 +84,7 @@ public class UpdateConceptName
             concept.addConceptName(newConceptName);
             
             concept.getConceptMetadata().addHistory(history);
+            dao.remove(oldConceptName);
             dao.persist(concept);
             dao.persist(history);
         }

@@ -12,22 +12,16 @@ import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 
 
-public class UpdateConceptName
+public class DeleteConceptName
 {
-	private final String newConceptName;
-    private final String oldConceptName;
-    private final UserAccount userAccount;
-    private final String typeOfName;
+    private String conceptName;
+    private UserAccount userAccount;
 
-    public UpdateConceptName(String newConceptName, String oldConceptName, UserAccount userAccount, String type) 
+    public DeleteConceptName(String conceptName, UserAccount userAccount) 
     {
-        this.newConceptName = newConceptName;
-        this.oldConceptName = oldConceptName;
-        this.userAccount = userAccount;
-        this.typeOfName = type;
+      this.conceptName = conceptName;
+      this.userAccount = userAccount;
     }
-
-
 
 
     public boolean apply(ToolBelt toolBelt)
@@ -37,53 +31,23 @@ public class UpdateConceptName
          dao.startTransaction();
 
     //     //finding the concept
-         ConceptName oldConceptName = dao.findByName(this.oldConceptName);
+         ConceptName conceptName = dao.findByName(this.conceptName);
 
     //     //making sure the concept exists
-         if (oldConceptName == null)
-             throw new RuntimeException("Unable to find concept name" + this.oldConceptName);
+         if (conceptName == null)
+             throw new RuntimeException("Unable to find concept name" + this.conceptName);
 
-        Concept concept =  oldConceptName.getConcept();//conceptDao.findByName(this.concepts);
+        Concept concept =  conceptName.getConcept();//conceptDao.findByName(this.concepts);
 
-        KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
-        
-        ConceptName newConceptName = knowledgebaseFactory.newConceptName();
-
-         //setting other name to the concept
-         newConceptName.setName(this.newConceptName);
-
-         //checking to see what kind of name it is and assigning it
-         switch (this.typeOfName.toLowerCase())
-        {
-            case "common":
-                newConceptName.setNameType(ConceptNameTypes.COMMON.toString());
-                break;
-            
-            case "synonym":
-                newConceptName.setNameType(ConceptNameTypes.SYNONYM.toString());
-                break;
-
-            case "former":
-                newConceptName.setNameType(ConceptNameTypes.FORMER.toString());
-                break;
-
-            default:
-                newConceptName.setNameType(ConceptNameTypes.ALTERNATE.toString());
-                break;
-
-        }
         
           //replaceConceptName(UserAccount userAccount, ConceptName oldName, ConceptName newName) {
-          History history = toolBelt.getHistoryFactory().replaceConceptName(userAccount, oldConceptName,newConceptName);
+          History history = toolBelt.getHistoryFactory().delete(userAccount, conceptName);
 
 
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
         {
-
-            concept.removeConceptName(oldConceptName);
-            concept.addConceptName(newConceptName);
-            
             concept.getConceptMetadata().addHistory(history);
+            dao.remove(conceptName);
             dao.persist(concept);
             dao.persist(history);
         }

@@ -506,6 +506,52 @@ public class Main {
                return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
            }
        });
+
+      delete("/deleteConceptName/:name", (request, response) -> {
+
+           ToolBelt toolBelt = Initializer.getToolBelt();
+           // Need user. Normally we would look this up
+           // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+           // userAccount.setRole("Admin");
+           // userAccount.setUserName("brian");
+
+          if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+          if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+
+           response.type("application/json");
+
+           //checking to see if concept can be created and return json
+           try
+           {
+
+                //JToken  jtoken = new JToken();
+
+               JToken.verifyToken(request.queryParams("jwt"),userAccount);      
+
+               DeleteConcept fn = new DeleteConcept(request.params(":name"), userAccount); 
+
+               if(fn.apply(toolBelt))
+                  return "{\"message\":\"Concept has been Deleted!\",\"code\": \"201\"}";
+
+               else
+                  return "{\"message\":\"Concept was not deleted! User is not admin.\",\"code\": \"401\"}";
+
+           }
+           catch (Exception e)
+           {
+               return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+           }
+       });
 	}
 
   public static UserAccount findUser(String userName)
