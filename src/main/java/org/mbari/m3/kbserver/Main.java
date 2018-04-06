@@ -378,7 +378,7 @@ public class Main {
                 JToken.verifyToken(request.queryParams("jwt"),userAccount);
 
                 //public UpdateConceptName(String newConceptName, String conceptApplyTo, UserAccount userAccount, String type) 
-                UpdateConceptName fn = new UpdateConceptName(request.queryParams("newConceptName"), request.params(":oldConceptName"), userAccount, request.queryParams("type"),request.params(":concept"));
+                UpdateConceptName fn = new UpdateConceptName(request.queryParams("newConceptName"), request.params(":oldConceptName"), userAccount, request.queryParams("type"));
 
                 if(fn.apply(toolBelt))
                   {
