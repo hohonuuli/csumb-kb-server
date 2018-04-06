@@ -20,13 +20,13 @@ public class UpdateConceptName
     private final String typeOfName;
     private final String concepts;
 
-    public UpdateConceptName(String newConceptName, String oldConceptName, UserAccount userAccount, String type, String concept) 
+    public UpdateConceptName(String newConceptName, String oldConceptName, UserAccount userAccount, String type) 
     {
         this.newConceptName = newConceptName;
         this.oldConceptName = oldConceptName;
         this.userAccount = userAccount;
         this.typeOfName = type;
-        this.concepts = concept;
+        //this.concepts = concept;
     }
 
 
@@ -35,7 +35,7 @@ public class UpdateConceptName
     public boolean apply(ToolBelt toolBelt)
     {
          boolean ok = true;
-         ConceptDAO conceptDao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+         //ConceptDAO conceptDao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
          ConceptNameDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO();
          dao.startTransaction();
 
@@ -44,12 +44,9 @@ public class UpdateConceptName
 
     //     //making sure the concept exists
          if (oldConceptName == null)
-             throw new RuntimeException("Unable to find concept name " + this.oldConceptName);
+             throw new RuntimeException("Unable to find concept name" + this.oldConceptName);
 
-        Concept concept = conceptDao.findByName(this.concepts);
-
-        if (concept == null)
-             throw new RuntimeException("Unable to find concept " + this.concepts);
+        Concept concept =  oldConceptName.getConcept();//conceptDao.findByName(this.concepts);
 
         KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
         
@@ -86,6 +83,11 @@ public class UpdateConceptName
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
         {
 
+            //adding the concept name to concept
+            // concept.addConceptName(newConceptName);
+
+            // //setting who made the change
+            // concept.setOriginator(userAccount.getUserName());
             concept.removeConceptName(oldConceptName);
             concept.addConceptName(newConceptName);
             

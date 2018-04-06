@@ -334,7 +334,7 @@ public class Main {
        });
 
 
-      post("/updateConceptName/:concept", (request, response) -> {
+      post("/updateConceptName/:oldConceptName", (request, response) -> {
 
           ToolBelt toolBelt = Initializer.getToolBelt();
               // Need user. Normally we would look this up
@@ -342,13 +342,13 @@ public class Main {
               // userAccount.setRole("Admin");
               // userAccount.setUserName("brian");
 
-          if(request.params(":concept") == null)
-            return "{\"message\":\"concept to apply to was not provided in endpoint\",\"code\": \"401\"}";
+          // if(request.params(":concept") == null)
+          //   return "{\"message\":\"concept to apply to was not provided in endpoint\",\"code\": \"401\"}";
 
          if(request.queryParams("newConceptName") == null)
             return "{\"message\":\"conceptName was not provided in endpoint\",\"code\": \"401\"}";
 
-          if(request.queryParams("oldConceptName") == null)
+          if(request.params("oldConceptName") == null)
             return "{\"message\":\"oldConceptName was not provided in endpoint\",\"code\": \"401\"}";
 
          if(request.queryParams("userName") == null)
@@ -378,7 +378,7 @@ public class Main {
                 JToken.verifyToken(request.queryParams("jwt"),userAccount);
 
                 //public UpdateConceptName(String newConceptName, String conceptApplyTo, UserAccount userAccount, String type) 
-                UpdateConceptName fn = new UpdateConceptName(request.queryParams("newConceptName"), request.queryParams("oldConceptName"), userAccount, request.queryParams("type"),request.params(":concept"));
+                UpdateConceptName fn = new UpdateConceptName(request.queryParams("newConceptName"), request.params(":oldConceptName"), userAccount, request.queryParams("type"),request.params(":concept"));
 
                 if(fn.apply(toolBelt))
                   {
