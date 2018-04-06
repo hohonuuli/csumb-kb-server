@@ -37,6 +37,10 @@ public class DeleteConceptName
          if (conceptName == null)
              throw new RuntimeException("Unable to find concept name" + this.conceptName);
 
+         if(conceptName.getNameType().equals("primary"))
+             throw new RuntimeException("Cannot delete primary concept name; name: " + this.conceptName);
+
+
         Concept concept =  conceptName.getConcept();//conceptDao.findByName(this.concepts);
 
         
@@ -46,6 +50,7 @@ public class DeleteConceptName
 
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
         {
+            concept.removeConceptName(conceptName);
             concept.getConceptMetadata().addHistory(history);
             dao.remove(conceptName);
             dao.persist(concept);

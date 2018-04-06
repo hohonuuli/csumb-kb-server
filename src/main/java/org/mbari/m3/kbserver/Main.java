@@ -9,6 +9,7 @@ import org.mbari.m3.kbserver.actions.CreateConcept;
 import org.mbari.m3.kbserver.actions.DeleteConcept;
 import org.mbari.m3.kbserver.actions.AddConceptName;
 import org.mbari.m3.kbserver.actions.UpdateConceptName;
+import org.mbari.m3.kbserver.actions.DeleteConceptName;
 import org.mbari.m3.kbserver.actions.AddConceptMedia;
 import org.mbari.m3.kbserver.actions.ConceptData;
 import vars.MiscDAOFactory;
@@ -515,6 +516,10 @@ public class Main {
            // userAccount.setRole("Admin");
            // userAccount.setUserName("brian");
 
+           if(request.params(":name") == null)
+            return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+
+
           if(request.queryParams("userName") == null)
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
@@ -538,13 +543,13 @@ public class Main {
 
                JToken.verifyToken(request.queryParams("jwt"),userAccount);      
 
-               DeleteConcept fn = new DeleteConcept(request.params(":name"), userAccount); 
+               DeleteConceptName fn = new DeleteConceptName(request.params(":name"), userAccount); 
 
                if(fn.apply(toolBelt))
-                  return "{\"message\":\"Concept has been Deleted!\",\"code\": \"201\"}";
+                  return "{\"message\":\"Concept name has been Deleted!\",\"code\": \"201\"}";
 
                else
-                  return "{\"message\":\"Concept was not deleted! User is not admin.\",\"code\": \"401\"}";
+                  return "{\"message\":\"Concept name was not deleted! User is not admin.\",\"code\": \"401\"}";
 
            }
            catch (Exception e)
