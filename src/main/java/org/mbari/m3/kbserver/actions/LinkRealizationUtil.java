@@ -1,6 +1,10 @@
 package org.mbari.m3.kbserver.actions;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+
+import javax.tools.Tool;
 
 import com.typesafe.config.ConfigException.Null;
 
@@ -24,12 +28,12 @@ public class LinkRealizationUtil {
         this.userAccount = userAccount;
     }
 
-    public String getLinkRealizations(ToolBelt toolBelt, String conceptName) {
+    public Collection<LinkRealization> getLinkRealizations(ToolBelt toolBelt, String conceptName) {
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
 
         Collection<LinkRealization> linkRealizations;
-
+                        
         try {
             Concept concept = dao.findByName(conceptName);
             dao.close();
@@ -39,43 +43,117 @@ public class LinkRealizationUtil {
             }
         
             linkRealizations = concept.getConceptMetadata().getLinkRealizations();
-            return linkRealizations.toString();
+            return linkRealizations;
         }
 
         catch (Exception e) {
             System.err.println(e + " Issue with finding Concept Link Realizations.");
-            return "Error: LinkRealizations";
+            return null;
         }
     }
 
-    private static long randomNumber(long min, long max) {
-        long range = max - min;
-        long value = (long) (Math.random() * range + min);
-        return value;
+    public LinkRealization findLinkRealizationByName(ToolBelt toolBelt, String conceptName, String linkName) {
+        Collection<LinkRealization> linkRealizations = getLinkRealizations(toolBelt, conceptName);
+        for (LinkRealization lr : linkRealizations) {
+            if (linkName.equals(lr.getLinkName())) {
+                return lr;
+            }
+        }
+        
+        return null;
     }
 
-    public LinkRealization makeLinkRealization(ToolBelt toolBelt, String linkName, String toConcept) {
-        KnowledgebaseFactory factory = toolBelt.getKnowledgebaseFactory();
-        LinkRealization lr = factory.newLinkRealization();
-        lr.setLinkName(linkName);
-        lr.setLinkValue(randomNumber(0, 9999) + "");
-        lr.setToConcept(toConcept);
-        return lr;
-    }
-
-    public boolean addLinkRealizations(ToolBelt toolBelt, String conceptName, String linkName, String toConcept) {
+    public boolean doesLinkRealizationExist(ToolBelt toolBelt, String conceptName, String linkName) {
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
 
-        try {
-            ConceptMetadata conceptMetadata = dao.findByName(conceptName).getConceptMetadata();
-            conceptMetadata.addLinkRealization(makeLinkRealization(toolBelt, linkName, toConcept));
+        Concept concept = dao.findByName(conceptName);
 
-            // TODO: Doesn't actually add anything.
-            return true;
+        if (getLinkRealizations(toolBelt, conceptName) == null) {
+            return false;
+        }
+
+        try {
+            Collection<LinkRealization> linkRealizations = getLinkRealizations(toolBelt, conceptName);
+            for (LinkRealization lr : linkRealizations) {
+                if (linkName.equals(lr.getLinkName())) {
+                    return true;
+                }
+            }
+
+            return false;
         }
         catch (Exception e) {
             return false;
         }
+    }
+
+    public boolean deleteLinkRealization(ToolBelt toolBelt, String conceptName, String linkName) {
+        LinkRealization lr = findLinkRealizationByName(toolBelt, conceptName, linkName);
+
+        ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        dao.startTransaction();
+
+        ConceptMetadata cm = dao.findByName(conceptName).getConceptMetadata();
+
+        if (lr == null) {
+            return false;
+        } else {
+            try {
+                // TODO: Not actually deleting anything..
+                cm.removeLinkRealization(lr);
+                dao.persist(cm);
+                History history = toolBelt.getHistoryFactory().add(userAccount, cm.getConcept());
+                dao.persist(history);
+                dao.endTransaction();
+                dao.close();
+
+                return true;
+            }
+            catch (Exception e) {
+                System.err.println(e);
+                return false;
+            }
+        }
+    }
+
+    public LinkRealization makeLinkRealization(ToolBelt toolBelt, String linkName, String toConcept, String linkValue) {
+        KnowledgebaseFactory factory = toolBelt.getKnowledgebaseFactory();
+        LinkRealization lr = factory.newLinkRealization();
+        lr.setLinkName(linkName);
+        lr.setLinkValue(linkValue);
+        lr.setToConcept(toConcept);
+        return lr;
+    }
+
+    public boolean addLinkRealizations(ToolBelt toolBelt, String conceptName, String linkName, String toConcept, String linkValue) {
+        ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        dao.startTransaction();
+
+        boolean status;
+
+        try {
+            Concept concept = dao.findByName(conceptName);
+
+            if (doesLinkRealizationExist(toolBelt, conceptName, linkName)) {
+                return false;
+            }
+
+            ConceptMetadata conceptMetadata = concept.getConceptMetadata();
+            conceptMetadata.addLinkRealization(makeLinkRealization(toolBelt, linkName, toConcept, linkValue));
+
+            History history = toolBelt.getHistoryFactory().add(userAccount, concept);
+
+            dao.persist(history);
+            dao.endTransaction();
+            dao.close();
+
+            status = true;
+        }
+        catch (Exception e) {
+            status = false;
+        }
+
+        return status;
     }
 }
