@@ -1,5 +1,17 @@
 # csumb-kb-server
 
+
+## Endpoints 
+```src/main/java/org/mbari/m3/kbserver/Main.java```
+* userLogin
+* changeParent
+* getMetadata
+* createConcept
+* addConceptMedia
+* addConceptName
+* addUserAccount
+* deleteConcept
+
 ## Start up
 
 1. Clone [vars-kb](http://github.com/mbari-media-managment/vars-kb)
