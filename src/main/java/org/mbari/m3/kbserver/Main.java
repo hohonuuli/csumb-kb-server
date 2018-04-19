@@ -14,6 +14,7 @@ import org.mbari.m3.kbserver.actions.AddConceptMedia;
 import org.mbari.m3.kbserver.actions.ConceptData;
 import vars.MiscDAOFactory;
 import org.mbari.m3.kbserver.actions.AddUserAccount;
+import org.mbari.m3.kbserver.actions.DeleteConceptMedia;
 import org.mbari.m3.kbserver.actions.ChangeParent;
 import org.mbari.m3.kbserver.actions.JToken;
 import vars.UserAccountDAO;
@@ -168,6 +169,11 @@ public class Main {
 
          if(request.queryParams("jwt") == null)
             return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+
+          if(request.queryParams("parent") == null)
+            return "{\"message\":\"parent concept was not provided in endpoint\",\"code\": \"401\"}";
+
+
             //return "{\"message\":\"jwt token was not provided in endpoint\",\"code\": \"401\"}";
          
 
@@ -186,7 +192,7 @@ public class Main {
 
 
         //create concept
-        CreateConcept fn = new CreateConcept("behavior", request.params(":name"), userAccount);
+        CreateConcept fn = new CreateConcept(request.queryParams("parent"), request.params(":name"), userAccount);
         response.type("application/json");
 
         //checking to see if concept can be created and return json
@@ -247,6 +253,65 @@ public class Main {
             else
             {
               String s = "{\"message\":\"media not added to concept. User is not admin.\",\"code\": \"401\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            }
+
+
+        }
+        catch (Exception e)
+        {
+            return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+        }
+
+    });
+
+
+
+    post("/deleteConceptMedia/:name",(request,response) -> {
+
+        ToolBelt toolBelt = Initializer.getToolBelt();
+        // Need user. Normally we would look this up
+        // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+        // userAccount.setRole("Admin");
+        // userAccount.setUserName("brian");
+
+        if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+
+          if(request.queryParams("url") == null)
+            return "{\"message\":\"url not provided in endpoint\",\"code\": \"401\"}"; 
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+        response.type("application/json");
+
+
+        //checking to see if concept can be created and return json
+        try
+        {
+            //JToken  jtoken = new JToken();
+
+            JToken.verifyToken(request.queryParams("jwt"),userAccount);
+
+
+            DeleteConceptMedia fn = new DeleteConceptMedia(request.params(":name"),request.queryParams("url"), userAccount);
+            if(fn.apply(toolBelt))
+            {
+              String s = "{\"message\":\"media deleted\",\"code\": \"201\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            } 
+            else
+            {
+              String s = "{\"message\":\"media not deleted. User is not admin.\",\"code\": \"401\",";
               s += "\"type\":\""+ request.queryParams("type")+"\"}";
               return s;
             }
