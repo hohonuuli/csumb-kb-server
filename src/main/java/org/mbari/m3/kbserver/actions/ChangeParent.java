@@ -26,8 +26,22 @@ public class ChangeParent {
         this.userAccount = userAccount;
     }
 
-    public boolean isCircular(Concept thisConcept) {
-        return false;
+    public boolean isCircular(ToolBelt toolBelt, Concept thisConcept) {
+        String parentName = thisConcept.getParentConcept().getPrimaryConceptName().getName();
+        ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        // load concept in a transaction so descendants get loaded from database
+        dao.startTransaction();
+        Concept concept = thisConcept;
+        boolean hasDescendent = concept.hasDescendent(parentName);
+        dao.endTransaction();
+        dao.close();
+
+        if (hasDescendent) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     // TODO: Get better identifyer for top of Phylogenic tree
@@ -80,14 +94,19 @@ public class ChangeParent {
             return false;
         }
 
-        // TODO: Check if Concept has a circular refernce
-        //
-
         // PARENT.removeChildConcept(existingConcept);
         currentParentConcept.removeChildConcept(existingConcept);
 
         // NEW_PARENT.addChildConcept(existingConcept);
         newParentConcept.addChildConcept(existingConcept);
+
+        // Check if Concept has a circular refernce
+        if (this.isCircular(toolBelt, existingConcept)) {
+            System.out.println("Contains circular reference.");
+            return false;
+        }
+
+        
 
         dao.persist(existingConcept);
         History history = toolBelt.getHistoryFactory().add(userAccount, existingConcept);

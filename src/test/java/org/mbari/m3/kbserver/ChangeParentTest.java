@@ -71,6 +71,119 @@ public class ChangeParentTest {
         assertFalse(changeParent.isChildOfRootConcept(toolBelt, concept));
     }
 
+    @Test 
+    public void testIsCircularNotCircleExample() {
+        /*
+
+        Behavior
+            X
+        Concept One
+            |      
+        Concept Two
+            |      
+        Concept Three
+        
+        */
+
+        changeParent = new ChangeParent("", "", userAccount);
+
+        CreateConcept concept1 = new CreateConcept("behavior", "CircleConceptOne", userAccount);
+        concept1.apply(toolBelt);
+        CreateConcept concept2 = new CreateConcept("CircleConceptOne", "CircleConceptTwo", userAccount);
+        concept2.apply(toolBelt);
+        CreateConcept concept3 = new CreateConcept("CircleConceptTwo", "CircleConceptThree", userAccount);
+        concept3.apply(toolBelt);
+        
+        Concept concept = dao.findByName("CircleConceptOne");
+
+        boolean test = changeParent.isCircular(toolBelt, concept);
+        
+        try {
+            DeleteConcept dc = new DeleteConcept("CircleConceptOne", userAccount);
+            dc.apply(toolBelt);
+        }
+        catch (RuntimeException rException) {
+            System.out.println("Already deleted / doesn't exist.");
+        }
+
+        try {
+            DeleteConcept dc = new DeleteConcept("CircleConceptTwo", userAccount);
+            dc.apply(toolBelt);
+        }
+        catch (RuntimeException rException) {
+            System.out.println("Already deleted / doesn't exist.");
+        }
+
+        try {
+            DeleteConcept dc = new DeleteConcept("CircleConceptThree", userAccount);
+            dc.apply(toolBelt);
+        }
+        catch (RuntimeException rException) {
+            System.out.println("Already deleted / doesn't exist.");
+        } 
+
+        assertFalse(test);
+    }
+
+    @Test
+    public void testIsCircularCircleExample() {
+        /*
+
+        Behavior
+            X
+        Concept One --\
+            |         |
+        Concept Two   |
+            |         |
+        Concept Three /
+        
+        */
+
+        CreateConcept concept1 = new CreateConcept("behavior", "CircleConceptOne", userAccount);
+        concept1.apply(toolBelt);
+        CreateConcept concept2 = new CreateConcept("CircleConceptOne", "CircleConceptTwo", userAccount);
+        concept2.apply(toolBelt);
+        CreateConcept concept3 = new CreateConcept("CircleConceptTwo", "CircleConceptThree", userAccount);
+        concept3.apply(toolBelt);
+
+        ChangeParent changeParent = new ChangeParent("CircleConceptThree", "CircleConceptOne", userAccount);
+        
+        boolean test;
+        
+        try {
+            test = changeParent.apply(toolBelt);
+        }
+        catch (StackOverflowError soe) {
+            test = false;
+        }
+
+        try {
+            DeleteConcept dc = new DeleteConcept("CircleConceptOne", userAccount);
+            dc.apply(toolBelt);
+        }
+        catch (RuntimeException rException) {
+            System.out.println("Already deleted / doesn't exist.");
+        }
+
+        try {
+            DeleteConcept dc = new DeleteConcept("CircleConceptTwo", userAccount);
+            dc.apply(toolBelt);
+        }
+        catch (RuntimeException rException) {
+            System.out.println("Already deleted / doesn't exist.");
+        }
+
+        try {
+            DeleteConcept dc = new DeleteConcept("CircleConceptThree", userAccount);
+            dc.apply(toolBelt);
+        }
+        catch (RuntimeException rException) {
+            System.out.println("Already deleted / doesn't exist.");
+        } 
+
+        assertFalse(test);
+    }
+
     @Test
     public void testApply() {
         // Create new concept

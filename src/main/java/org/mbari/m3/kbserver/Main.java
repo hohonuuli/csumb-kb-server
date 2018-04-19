@@ -17,6 +17,8 @@ import org.mbari.m3.kbserver.actions.AddUserAccount;
 import org.mbari.m3.kbserver.actions.DeleteConceptMedia;
 import org.mbari.m3.kbserver.actions.ChangeParent;
 import org.mbari.m3.kbserver.actions.JToken;
+import org.mbari.m3.kbserver.actions.LinkRealizationUtil;
+
 import vars.UserAccountDAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
@@ -622,6 +624,200 @@ public class Main {
                return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
            }
        });
+      
+       // Link realization
+
+    get("/getLinkRealizations", (request, response) -> {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+
+      if (request.queryParams("userName") == null) {
+        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+      }
+      
+      if (request.queryParams("jwt") == null) {
+        return "jwt is: " + request.queryParams("jwt");
+      }
+
+      if (request.queryParams("concept") == null) {
+        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+    
+      UserAccount userAccount = findUser(request.queryParams("userName"));
+
+      if (userAccount == null) {
+        return "{\"message\":\"username not found\",\"code\": \"401\"}";
+      }
+
+      try {
+        JToken.verifyToken(request.queryParams("jwt"), userAccount);
+        
+        LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
+        response.type("application/json");
+
+        String linkRealizationResponse = linkRealizationUtil.getLinkRealizations(toolBelt, request.queryParams("concept")).toString();
+
+        if (linkRealizationResponse.equals("Error: LinkRealizations")) {
+          return "{\"message\":\"" + linkRealizationResponse + "\", \"code\": \"401\"}";
+        }
+        
+        return "{\"message\":\"" + linkRealizationResponse + "\", \"code\": \"200\"}";
+      }
+  
+      catch (Exception e) {
+          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+      }
+    });
+
+    post("/addLinkRealizations", (request, response) -> {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+
+      if (request.queryParams("userName") == null) {
+        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+      }
+      
+      if (request.queryParams("jwt") == null) {
+        return "jwt is: " + request.queryParams("jwt");
+      }
+
+      if (request.queryParams("concept") == null) {
+        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("toConcept") == null) {
+        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkName") == null) {
+        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkValue") == null) {
+        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+    
+      UserAccount userAccount = findUser(request.queryParams("userName"));
+
+      if (userAccount == null) {
+        return "{\"message\":\"username not found\",\"code\": \"401\"}";
+      }
+
+      try {
+        JToken.verifyToken(request.queryParams("jwt"), userAccount);
+        
+        LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
+        response.type("application/json");
+
+        if (linkRealizationUtil.addLinkRealizations(toolBelt, request.queryParams("concept"), request.queryParams("linkName"), request.queryParams("toConcept"), request.queryParams("linkValue"))) {
+          return "{\"message\":\"successly added link realization\", \"code\": \"200\"}";
+        } 
+        
+        else {
+          return "{\"message\":\"Issue with adding link realization, linkName may already exist.\", \"code\": \"401\"}";
+        }
+      }
+  
+      catch (Exception e) {
+          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+      }
+    });
+
+    delete("/deleteLinkRealization", (request, response) -> {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+
+      if (request.queryParams("userName") == null) {
+        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+      }
+      
+      if (request.queryParams("jwt") == null) {
+        return "jwt is: " + request.queryParams("jwt");
+      }
+
+      if (request.queryParams("concept") == null) {
+        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkName") == null) {
+        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+    
+      UserAccount userAccount = findUser(request.queryParams("userName"));
+
+      if (userAccount == null) {
+        return "{\"message\":\"username not found\",\"code\": \"401\"}";
+      }
+
+      try {
+        JToken.verifyToken(request.queryParams("jwt"), userAccount);
+        
+        LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
+        response.type("application/json");
+
+        if (linkRealizationUtil.deleteLinkRealization(toolBelt, request.queryParams("concept"), request.queryParams("linkName"))) {
+          return "{\"message\":\"successly deleted link realization\", \"code\": \"200\"}";
+        } 
+        
+        else {
+          return "{\"message\":\"Issue with deleting link realization\", \"code\": \"401\"}";
+        }
+      }
+  
+      catch (Exception e) {
+          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+      }
+    });
+
+    post("/updateLinkRealization", (request, response) -> {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+
+      if (request.queryParams("userName") == null) {
+        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+      }
+      
+      if (request.queryParams("jwt") == null) {
+        return "jwt is: " + request.queryParams("jwt");
+      }
+
+      if (request.queryParams("concept") == null) {
+        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("toConcept") == null) {
+        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkName") == null) {
+        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkValue") == null) {
+        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+    
+      UserAccount userAccount = findUser(request.queryParams("userName"));
+
+      if (userAccount == null) {
+        return "{\"message\":\"username not found\",\"code\": \"401\"}";
+      }
+
+      try {
+        JToken.verifyToken(request.queryParams("jwt"), userAccount);
+        
+        LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
+        response.type("application/json");
+
+        if (!linkRealizationUtil.doesLinkRealizationExist(toolBelt, request.queryParams("concept"), request.queryParams("linkName"))) {
+          return "{\"message\":\"successly updated link realization\", \"code\": \"200\"}";
+        } 
+        
+        else {
+          return "{\"message\":\"Issue with adding link realization\", \"code\": \"401\"}";
+        }
+      }
+  
+      catch (Exception e) {
+          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+      }
+    });
 	}
 
   public static UserAccount findUser(String userName)
