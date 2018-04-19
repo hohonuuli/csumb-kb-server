@@ -8,10 +8,13 @@ import org.mbari.m3.kbserver.Initializer;
 import org.mbari.m3.kbserver.actions.CreateConcept;
 import org.mbari.m3.kbserver.actions.DeleteConcept;
 import org.mbari.m3.kbserver.actions.AddConceptName;
+import org.mbari.m3.kbserver.actions.UpdateConceptName;
+import org.mbari.m3.kbserver.actions.DeleteConceptName;
 import org.mbari.m3.kbserver.actions.AddConceptMedia;
 import org.mbari.m3.kbserver.actions.ConceptData;
 import vars.MiscDAOFactory;
 import org.mbari.m3.kbserver.actions.AddUserAccount;
+import org.mbari.m3.kbserver.actions.DeleteConceptMedia;
 import org.mbari.m3.kbserver.actions.ChangeParent;
 import org.mbari.m3.kbserver.actions.JToken;
 import org.mbari.m3.kbserver.actions.LinkRealizationUtil;
@@ -168,6 +171,11 @@ public class Main {
 
          if(request.queryParams("jwt") == null)
             return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+
+          if(request.queryParams("parent") == null)
+            return "{\"message\":\"parent concept was not provided in endpoint\",\"code\": \"401\"}";
+
+
             //return "{\"message\":\"jwt token was not provided in endpoint\",\"code\": \"401\"}";
          
 
@@ -186,7 +194,7 @@ public class Main {
 
 
         //create concept
-        CreateConcept fn = new CreateConcept("behavior", request.params(":name"), userAccount);
+        CreateConcept fn = new CreateConcept(request.queryParams("parent"), request.params(":name"), userAccount);
         response.type("application/json");
 
         //checking to see if concept can be created and return json
@@ -260,6 +268,65 @@ public class Main {
 
     });
 
+
+
+    post("/deleteConceptMedia/:name",(request,response) -> {
+
+        ToolBelt toolBelt = Initializer.getToolBelt();
+        // Need user. Normally we would look this up
+        // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+        // userAccount.setRole("Admin");
+        // userAccount.setUserName("brian");
+
+        if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+
+          if(request.queryParams("url") == null)
+            return "{\"message\":\"url not provided in endpoint\",\"code\": \"401\"}"; 
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+        response.type("application/json");
+
+
+        //checking to see if concept can be created and return json
+        try
+        {
+            //JToken  jtoken = new JToken();
+
+            JToken.verifyToken(request.queryParams("jwt"),userAccount);
+
+
+            DeleteConceptMedia fn = new DeleteConceptMedia(request.params(":name"),request.queryParams("url"), userAccount);
+            if(fn.apply(toolBelt))
+            {
+              String s = "{\"message\":\"media deleted\",\"code\": \"201\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            } 
+            else
+            {
+              String s = "{\"message\":\"media not deleted. User is not admin.\",\"code\": \"401\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            }
+
+
+        }
+        catch (Exception e)
+        {
+            return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+        }
+
+    });
+
     //add synonym to a concept
 
      //********************!!!!IMPORTANT!!!!!!!!!********************
@@ -277,9 +344,17 @@ public class Main {
         // userAccount.setRole("Admin");
         // userAccount.setUserName("brian");
 
+         if(request.params(":conceptApplyTo") == null)
+            return "{\"message\":\"concept to apply to was not provided in endpoint\",\"code\": \"401\"}";
+
+         if(request.queryParams("conceptName") == null)
+            return "{\"message\":\"conceptName was not provided in endpoint\",\"code\": \"401\"}";
+
          if(request.queryParams("userName") == null)
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
+          if(request.queryParams("type") == null)
+            return "{\"message\":\"type was not provided in endpoint\",\"code\": \"401\"}";
 
          if(request.queryParams("jwt") == null)
             return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
@@ -325,6 +400,83 @@ public class Main {
         }
 
        });
+
+
+      post("/updateConceptName/:oldConceptName", (request, response) -> {
+
+          ToolBelt toolBelt = Initializer.getToolBelt();
+              // Need user. Normally we would look this up
+              // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+              // userAccount.setRole("Admin");
+              // userAccount.setUserName("brian");
+
+          // if(request.params(":concept") == null)
+          //   return "{\"message\":\"concept to apply to was not provided in endpoint\",\"code\": \"401\"}";
+
+         if(request.queryParams("newConceptName") == null)
+            return "{\"message\":\"conceptName was not provided in endpoint\",\"code\": \"401\"}";
+
+          if(request.params("oldConceptName") == null)
+            return "{\"message\":\"oldConceptName was not provided in endpoint\",\"code\": \"401\"}";
+
+         if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+          if(request.queryParams("type") == null)
+            return "{\"message\":\"type was not provided in endpoint\",\"code\": \"401\"}";
+
+         if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+              
+          UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+               if(userAccount == null)
+                  return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+          
+              //specifying response type
+              response.type("application/json");
+
+              try
+              {
+
+                //JToken  jtoken = new JToken();
+
+                JToken.verifyToken(request.queryParams("jwt"),userAccount);
+
+                //public UpdateConceptName(String newConceptName, String conceptApplyTo, UserAccount userAccount, String type) 
+                UpdateConceptName fn = new UpdateConceptName(request.queryParams("newConceptName"), request.params(":oldConceptName"), userAccount, request.queryParams("type"));
+
+                if(fn.apply(toolBelt))
+                  {
+                    String s = "{\"message\":\"concept name was updated!\",\"code\": \"201\",";
+                    s += "\"newConceptName\":\""+ request.queryParams("newConceptName")+"\",";
+                    s += "\"oldConceptName\":\""+ request.params(":oldConceptName")+"\",";
+                    s += "\"type\":\""+ request.queryParams("type")+"\",";
+                    s += "\"code\": \"201\"}";
+                    return s;
+                  } 
+                  else
+                  {
+                    String s = "{\"message\":\"concept name not updated! User is not admin.\",\"code\": \"401\",";
+                    s += "\"newConceptName\":\""+ request.queryParams("newConceptName")+"\",";
+                    s += "\"oldConceptName\":\""+ request.params(":oldConceptName")+"\",";
+                    s += "\"type\":\""+ request.queryParams("type")+"\",";
+                    s += "\"code\": \"401\"}";
+                    return s;
+                  }
+
+              }
+              catch (Exception e)
+              {
+                  return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+              }
+
+             });
+
+
+
 
         post("/addUserAccount/:userName", (request, response) -> {
 
@@ -423,6 +575,56 @@ public class Main {
            }
        });
 
+      delete("/deleteConceptName/:name", (request, response) -> {
+
+           ToolBelt toolBelt = Initializer.getToolBelt();
+           // Need user. Normally we would look this up
+           // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+           // userAccount.setRole("Admin");
+           // userAccount.setUserName("brian");
+
+           if(request.params(":name") == null)
+            return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+
+
+          if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+          if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+
+           response.type("application/json");
+
+           //checking to see if concept can be created and return json
+           try
+           {
+
+                //JToken  jtoken = new JToken();
+
+               JToken.verifyToken(request.queryParams("jwt"),userAccount);      
+
+               DeleteConceptName fn = new DeleteConceptName(request.params(":name"), userAccount); 
+
+               if(fn.apply(toolBelt))
+                  return "{\"message\":\"Concept name has been Deleted!\",\"code\": \"201\"}";
+
+               else
+                  return "{\"message\":\"Concept name was not deleted! User is not admin.\",\"code\": \"401\"}";
+
+           }
+           catch (Exception e)
+           {
+               return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+           }
+       });
+      
        // Link realization
 
     get("/getLinkRealizations", (request, response) -> {
