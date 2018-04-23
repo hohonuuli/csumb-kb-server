@@ -11,6 +11,7 @@ import org.mbari.m3.kbserver.actions.AddConceptName;
 import org.mbari.m3.kbserver.actions.UpdateConceptName;
 import org.mbari.m3.kbserver.actions.DeleteConceptName;
 import org.mbari.m3.kbserver.actions.AddConceptMedia;
+import org.mbari.m3.kbserver.actions.UpdateConceptMedia;
 import org.mbari.m3.kbserver.actions.ConceptData;
 import vars.MiscDAOFactory;
 import org.mbari.m3.kbserver.actions.AddUserAccount;
@@ -281,6 +282,82 @@ public class Main {
         }
 
     });
+
+
+ost("/updateConceptMedia/:name",(request,response) -> {
+
+        ToolBelt toolBelt = Initializer.getToolBelt();
+        // Need user. Normally we would look this up
+        // UserAccount userAccount = toolBelt.getMiscFactory().newUserAccount();
+        // userAccount.setRole("Admin");
+        // userAccount.setUserName("brian");
+
+        if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("type") == null)
+            return "{\"message\":\"type was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("previousUrl") == null)
+            return "{\"message\":\"previousUrl was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("newUrl") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("credit") == null)
+            return "{\"message\":\"credit was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("caption") == null)
+            return "{\"message\":\"caption was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("primary") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("jwt") == null)
+            return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
+
+         UserAccount userAccount = findUser(request.queryParams("userName"));
+
+
+         if(userAccount == null)
+            return "{\"message\":\"username not found\",\"code\": \"401\"}";
+
+        response.type("application/json");
+
+
+        //checking to see if concept can be created and return json
+        try
+        {
+            //JToken  jtoken = new JToken();
+
+            JToken.verifyToken(request.queryParams("jwt"),userAccount);
+
+
+            UpdateConceptMedia fn = new UpdateConceptMedia(request.params(":name"), toolBelt, userAccount);
+            if(fn.apply(request.queryParams("previousUrl"),request.queryParams("newUrl"), request.queryParams("caption"),request.queryParams("credit"),request.queryParams("type"),Boolean.valueOf(request.queryParams("primary"))))
+            {
+              String s = "{\"message\":\"media updated on concept\",\"code\": \"201\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            } 
+            else
+            {
+              String s = "{\"message\":\"media not updated onto concept. User is not admin.\",\"code\": \"401\",";
+              s += "\"type\":\""+ request.queryParams("type")+"\"}";
+              return s;
+            }
+
+
+        }
+        catch (Exception e)
+        {
+            return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+        }
+
+    });
+
+
+
 
 
 
