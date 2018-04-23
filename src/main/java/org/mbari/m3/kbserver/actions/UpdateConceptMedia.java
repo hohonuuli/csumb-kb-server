@@ -60,7 +60,6 @@ public class UpdateConceptMedia
             if(previousUrl.equals(s.getUrl()))
             {
                 oldMedia = s;
-                media = s;
                 urlFound = true;
                 break;
             }
@@ -82,17 +81,20 @@ public class UpdateConceptMedia
                     //EventBus.publish(StateLookup.TOPIC_WARNING, "Unable to read from " + verifyUrl.toExternalForm());
                 }
                 else {
+                    //System.out.println(" url: " + verifyUrl.toExternalForm())
                     media.setUrl(verifyUrl.toExternalForm());
                 }
             }
             catch (Exception e1) {
+                dao.endTransaction();
+                dao.close();
                 throw new RuntimeException("Failed to open URL, the URL will not be updated.");
             }
 
 
 		media.setCaption(caption);
 		media.setCredit(credit);
-		//media.setPrimary(primary);
+		media.setPrimary(primary);
 
 		//checking to see what kind of media it is
 		switch (type.toLowerCase())
@@ -146,7 +148,7 @@ public class UpdateConceptMedia
         history.setCreationDate(new Date());
         history.setAction(History.ACTION_REPLACE);
         history.setField(History.FIELD_MEDIA);
-        history.setOldValue(null);
+        history.setOldValue(oldMedia.getUrl());
         history.setNewValue(media.getUrl());
         //History history = toolBelt.getHistoryFactory().newHistory(userAccount, "REPLACE", "Media", media.getUrl(), null);
 

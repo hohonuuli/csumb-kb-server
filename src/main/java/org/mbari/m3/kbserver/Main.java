@@ -351,7 +351,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         }
         catch (Exception e)
         {
-            return "{\"message\":\""+e.getMessage() +"\", \"code\": \"401\"}";
+            return "{\"message\":\""+e.getMessage() +" catch exception update\", \"code\": \"401\"}";
         }
 
     });
@@ -361,7 +361,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
 
 
 
-    post("/deleteConceptMedia/:name",(request,response) -> {
+    delete("/deleteConceptMedia/:name",(request,response) -> {
 
         ToolBelt toolBelt = Initializer.getToolBelt();
         // Need user. Normally we would look this up
