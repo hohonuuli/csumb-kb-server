@@ -284,7 +284,7 @@ public class Main {
     });
 
 
-ost("/updateConceptMedia/:name",(request,response) -> {
+post("/updateConceptMedia/:name",(request,response) -> {
 
         ToolBelt toolBelt = Initializer.getToolBelt();
         // Need user. Normally we would look this up
@@ -302,7 +302,7 @@ ost("/updateConceptMedia/:name",(request,response) -> {
             return "{\"message\":\"previousUrl was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("newUrl") == null)
-            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+            return "{\"message\":\"newUrl was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("credit") == null)
             return "{\"message\":\"credit was not provided in endpoint\",\"code\": \"401\"}";
