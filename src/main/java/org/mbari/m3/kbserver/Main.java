@@ -18,7 +18,6 @@ import org.mbari.m3.kbserver.actions.DeleteConceptMedia;
 import org.mbari.m3.kbserver.actions.ChangeParent;
 import org.mbari.m3.kbserver.actions.JToken;
 import org.mbari.m3.kbserver.actions.LinkRealizationUtil;
-
 import vars.UserAccountDAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
@@ -223,6 +222,21 @@ public class Main {
         // userAccount.setUserName("brian");
 
         if(request.queryParams("userName") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("type") == null)
+            return "{\"message\":\"type was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("url") == null)
+            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("credit") == null)
+            return "{\"message\":\"credit was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("caption") == null)
+            return "{\"message\":\"caption was not provided in endpoint\",\"code\": \"401\"}";
+
+        if(request.queryParams("primary") == null)
             return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("jwt") == null)
