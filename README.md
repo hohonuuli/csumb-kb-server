@@ -11,6 +11,11 @@
 * addConceptName
 * addUserAccount
 * deleteConcept
+* addLinkRealization
+  * userName, jwt, concept, linkName, linkValue, toConcept
+* deleteLinkRealization
+* updateLinkRealization
+  * userName, jwt, concept, oldLinkName, oldLinkValue, oldToConcept, newLinkName, newLinkValue, newToConcept
 
 ## Start up
 

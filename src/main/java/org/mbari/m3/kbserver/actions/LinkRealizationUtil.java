@@ -126,6 +126,41 @@ public class LinkRealizationUtil {
         return lr;
     }
 
+    public boolean updateLinkRealization(ToolBelt toolBelt, String conceptName, String oldLinkName, String oldToConcept, String oldLinkValue, String newLinkName, String newToConcept, String newLinkValue) {
+        KnowledgebaseFactory factory = toolBelt.getKnowledgebaseFactory();
+        ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        dao.startTransaction();
+        
+        // Get the old link realization, used for history tracking
+        LinkRealization linkRealization = findLinkRealizationByName(toolBelt, conceptName, oldLinkName);
+
+        // Didn't exist
+        if (linkRealization == null) {
+            return false;
+        }
+
+        // Create a copy of the old values to create a history
+        LinkRealization oldValue = toolBelt.getKnowledgebaseFactory().newLinkRealization();
+
+        // Copy data over
+        oldValue.setLinkName(linkRealization.getLinkName());
+        oldValue.setToConcept(linkRealization.getToConcept());
+        oldValue.setLinkValue(linkRealization.getLinkValue());
+
+        linkRealization = dao.find(linkRealization);
+        linkRealization.setLinkName(newLinkName);
+        linkRealization.setToConcept(newToConcept);
+        linkRealization.setLinkValue(newLinkValue);
+
+        History history = toolBelt.getHistoryFactory().replaceLinkRealization(userAccount, oldValue, linkRealization);
+        linkRealization.getConceptMetadata().addHistory(history);
+        dao.persist(history);
+        dao.endTransaction();
+        dao.close();
+
+        return true;
+    }
+
     public boolean addLinkRealizations(ToolBelt toolBelt, String conceptName, String linkName, String toConcept, String linkValue) {
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
