@@ -28,6 +28,7 @@ public class DeleteConceptMedia
     public boolean apply(ToolBelt toolBelt)
     {
          boolean ok = true;
+         boolean urlFound = false;
          ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
          dao.startTransaction();
 
@@ -51,6 +52,9 @@ public class DeleteConceptMedia
                 break;
             }
          }
+
+         if(!urlFound)
+            throw new RuntimeException("Unable to find media with url: " + url);
 
           //replaceConceptName(UserAccount userAccount, ConceptName oldName, ConceptName newName) {
           History history = toolBelt.getHistoryFactory().delete(userAccount, media);
