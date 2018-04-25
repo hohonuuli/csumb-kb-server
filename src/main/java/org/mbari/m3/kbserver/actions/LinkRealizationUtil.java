@@ -175,9 +175,10 @@ public class LinkRealizationUtil {
             }
 
             ConceptMetadata conceptMetadata = concept.getConceptMetadata();
-            conceptMetadata.addLinkRealization(makeLinkRealization(toolBelt, linkName, toConcept, linkValue));
+            LinkRealization lr = makeLinkRealization(toolBelt, linkName, toConcept, linkValue);
+            conceptMetadata.addLinkRealization(lr);
 
-            History history = toolBelt.getHistoryFactory().add(userAccount, concept);
+            History history = toolBelt.getHistoryFactory().add(userAccount, lr);
 
             dao.persist(history);
             dao.endTransaction();
