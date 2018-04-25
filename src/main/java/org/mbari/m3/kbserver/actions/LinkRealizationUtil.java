@@ -95,26 +95,47 @@ public class LinkRealizationUtil {
         dao.startTransaction();
 
         ConceptMetadata cm = dao.findByName(conceptName).getConceptMetadata();
-
+        boolean ok = false;
         if (lr == null) {
             return false;
         } else {
             try {
                 // TODO: Not actually deleting anything..
+                
+                //History history = toolBelt.getHistoryFactory().add(userAccount, cm.getConcept());
+                //dao.persist(history);
+                // dao.endTransaction();
+                // dao.close();
+
+                History history = toolBelt.getHistoryFactory().delete(userAccount, lr);
+
+
+            if(new ApproveHistory(){}.approve(userAccount, history, dao))
+            {
                 cm.removeLinkRealization(lr);
                 dao.persist(cm);
-                History history = toolBelt.getHistoryFactory().add(userAccount, cm.getConcept());
+                //concept.getConceptMetadata().removeMedia(media);
+                cm.addHistory(history);
+                //dao.persist(concept);
                 dao.persist(history);
+                ok = true;
+            }
+
+            else
+                ok = false;
+
+                }
+                catch (Exception e) {
+                    System.err.println(e);
+                    ok = false;
+                }
+
+
                 dao.endTransaction();
                 dao.close();
+                return ok;
 
-                return true;
             }
-            catch (Exception e) {
-                System.err.println(e);
-                return false;
-            }
-        }
     }
 
     public LinkRealization makeLinkRealization(ToolBelt toolBelt, String linkName, String toConcept, String linkValue) {
