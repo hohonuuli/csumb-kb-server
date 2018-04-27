@@ -8,6 +8,7 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 import java.util.*;
@@ -36,6 +37,7 @@ public class ConceptData
 		getAlternatives();
 		getMedia();
 		getDescriptors();
+		getTemplates();
 		getHistory();
 		return jsonString;
 	}
@@ -189,7 +191,6 @@ public class ConceptData
 		int setSize = histories.size();
 		int i = 0;
 
-		System.out.println("BEFORE ITERATING THROUGH HISTORIES!!!!");
 		for(History s: histories)
 		{
 

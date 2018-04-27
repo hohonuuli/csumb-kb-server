@@ -1,22 +1,15 @@
 package org.mbari.m3.kbserver.actions;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import javax.tools.Tool;
 import com.typesafe.config.ConfigException.Null;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
-import vars.knowledgebase.ConceptMetadata;
-import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkTemplate;
-import vars.knowledgebase.Media;
 import vars.knowledgebase.ui.ToolBelt;
+import java.util.*;
+import javax.tools.Tool;
 
 public class LinkTemplateUtil
 {
@@ -42,7 +35,7 @@ public class LinkTemplateUtil
 	}
 
 
-	public void addTemplate()
+	public boolean addTemplate()
 	{
 		dao.startTransaction();
 		boolean ok = true;
@@ -59,10 +52,10 @@ public class LinkTemplateUtil
             	throw new RuntimeException("Concept already has a link template with name: " + linkName);
         }
 
-
         template.setLinkName(linkName);
         template.setLinkValue(linkValue);
         template.setToConcept(toConcept);
+
 
         History history = toolBelt.getHistoryFactory().add(userAccount, template);
 
@@ -80,12 +73,8 @@ public class LinkTemplateUtil
         dao.endTransaction();
         dao.close();
         return ok;
-
-
-
-
-
 	}
+
 
 
 }
