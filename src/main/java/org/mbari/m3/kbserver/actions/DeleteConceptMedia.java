@@ -9,6 +9,11 @@ import org.mbari.m3.kbserver.actions.ApproveHistory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 import java.util.*;
+import com.google.inject.Inject;
+import java.util.Date;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 public class DeleteConceptMedia
@@ -43,15 +48,37 @@ public class DeleteConceptMedia
          Collection<Media> conceptMedias = concept.getConceptMetadata().getMedias();
          Media media = null;
 
+        URL verifyUrl = null;
+
+        try {
+            verifyUrl = new URL(url);
+           final InputStream in = verifyUrl.openStream();
+           final int b = in.read();
+                if (b == -1) {
+                    throw new RuntimeException("Unable to read from " + verifyUrl.toExternalForm());
+                    //EventBus.publish(StateLookup.TOPIC_WARNING, "Unable to read from " + verifyUrl.toExternalForm());
+                }
+            }
+        catch (Exception e1) {
+                dao.endTransaction();
+                dao.close();
+                throw new RuntimeException("Failed to open URL, media will not be created on concept.");
+            }
+
          for (Media s : conceptMedias)
          {
 
-            if(url.equals(s.getUrl()))
+            System.out.println("s-url: " + s.getUrl() + " length: " + s.getUrl().length());
+            System.out.println("url: " + url + " length: " + url.length());
+
+            if(s.getUrl().equals(verifyUrl.toExternalForm()))
             {
                 media = s;
+                urlFound = true;
                 break;
             }
          }
+
 
          if(!urlFound)
             throw new RuntimeException("Unable to find media with url: " + url);
@@ -62,9 +89,18 @@ public class DeleteConceptMedia
 
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
         {
+
+            if(media.isPrimary())
+            {
+                for (Media s : conceptMedias)
+                {
+                    s.setPrimary(true);
+                    break;
+                }
+
+            }
             concept.getConceptMetadata().removeMedia(media);
             concept.getConceptMetadata().addHistory(history);
-            dao.persist(concept);
             dao.persist(history);
         }
 

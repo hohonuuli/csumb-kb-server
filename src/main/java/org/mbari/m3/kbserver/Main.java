@@ -229,7 +229,7 @@ public class Main {
             return "{\"message\":\"type was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("url") == null)
-            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+            return "{\"message\":\"url was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("credit") == null)
             return "{\"message\":\"credit was not provided in endpoint\",\"code\": \"401\"}";
@@ -238,7 +238,7 @@ public class Main {
             return "{\"message\":\"caption was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("primary") == null)
-            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+            return "{\"message\":\"primary was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("jwt") == null)
             return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
@@ -311,7 +311,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
             return "{\"message\":\"caption was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("primary") == null)
-            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+            return "{\"message\":\"primay was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("jwt") == null)
             return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
