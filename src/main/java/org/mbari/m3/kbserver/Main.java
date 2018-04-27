@@ -803,7 +803,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         } 
         
         else {
-          return "{\"message\":\"Issue with adding link realization, linkName may already exist.\", \"code\": \"401\"}";
+          return "{\"message\":\"Issue with adding link realization.\", \"code\": \"401\"}";
         }
       }
   
@@ -872,16 +872,28 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
-      if (request.queryParams("toConcept") == null) {
-        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
+      if (request.queryParams("oldToConcept") == null) {
+        return "{\"message\":\"oldToConcept was not provided in endpoint\",\"code\": \"401\"}";
       }
 
-      if (request.queryParams("linkName") == null) {
-        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      if (request.queryParams("oldLinkName") == null) {
+        return "{\"message\":\"oldLinkName name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
-      if (request.queryParams("linkValue") == null) {
-        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      if (request.queryParams("oldLinkValue") == null) {
+        return "{\"message\":\"oldLinkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newToConcept") == null) {
+        return "{\"message\":\"newToConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newLinkName") == null) {
+        return "{\"message\":\"newLinkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newLinkValue") == null) {
+        return "{\"message\":\"newLinkValue name was not provided in endpoint\",\"code\": \"401\"}";
       }
     
       UserAccount userAccount = findUser(request.queryParams("userName"));
@@ -896,7 +908,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
         response.type("application/json");
 
-        if (!linkRealizationUtil.doesLinkRealizationExist(toolBelt, request.queryParams("concept"), request.queryParams("linkName"))) {
+        if (linkRealizationUtil.updateLinkRealization(toolBelt, request.queryParams("concept"), request.queryParams("oldLinkName"), request.queryParams("oldToConcept"), request.queryParams("oldLinkValue"), request.queryParams("newLinkName"), request.queryParams("newToConcept"), request.queryParams("newLinkValue"))) {
           return "{\"message\":\"successly updated link realization\", \"code\": \"200\"}";
         } 
         
