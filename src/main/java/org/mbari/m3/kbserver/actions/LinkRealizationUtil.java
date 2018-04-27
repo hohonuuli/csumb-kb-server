@@ -98,44 +98,34 @@ public class LinkRealizationUtil {
         boolean ok = false;
         if (lr == null) {
             return false;
-        } else {
+        } 
+        
+        else {
             try {
-                // TODO: Not actually deleting anything..
-                
-                //History history = toolBelt.getHistoryFactory().add(userAccount, cm.getConcept());
-                //dao.persist(history);
-                // dao.endTransaction();
-                // dao.close();
-
                 History history = toolBelt.getHistoryFactory().delete(userAccount, lr);
+                
+                if (new ApproveHistory(){}.approve(userAccount, history, dao)) {
+                    // TODO: Verify this is correct
+                    // This dao.merge() fixes things, but is it because the Link Realizations were added wrong?
+                    lr = dao.merge(lr);
 
-
-            if(new ApproveHistory(){}.approve(userAccount, history, dao))
-            {
-                cm.removeLinkRealization(lr);
-                dao.persist(cm);
-                //concept.getConceptMetadata().removeMedia(media);
-                cm.addHistory(history);
-                //dao.persist(concept);
-                dao.persist(history);
-                ok = true;
+                    cm.removeLinkRealization(lr);
+                    dao.remove(lr);
+                    cm.addHistory(history);
+                    dao.persist(history);
+                    ok = true;
+                }
             }
 
-            else
+            catch (Exception e) {
+                System.err.println(e);
                 ok = false;
-
-                }
-                catch (Exception e) {
-                    System.err.println(e);
-                    ok = false;
-                }
-
-
-                dao.endTransaction();
-                dao.close();
-                return ok;
-
             }
+
+            dao.endTransaction();
+            dao.close();
+            return ok;
+        }
     }
 
     public LinkRealization makeLinkRealization(ToolBelt toolBelt, String linkName, String toConcept, String linkValue) {
@@ -151,6 +141,7 @@ public class LinkRealizationUtil {
         KnowledgebaseFactory factory = toolBelt.getKnowledgebaseFactory();
         ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
+        boolean status = false;
         
         // Get the old link realization, used for history tracking
         LinkRealization linkRealization = findLinkRealizationByName(toolBelt, conceptName, oldLinkName);
@@ -160,22 +151,34 @@ public class LinkRealizationUtil {
             return false;
         }
 
-        // Create a copy of the old values to create a history
-        LinkRealization oldValue = toolBelt.getKnowledgebaseFactory().newLinkRealization();
+        try {
+            // Create a copy of the old values to create a history
+            LinkRealization oldValue = toolBelt.getKnowledgebaseFactory().newLinkRealization();
 
-        // Copy data over
-        oldValue.setLinkName(linkRealization.getLinkName());
-        oldValue.setToConcept(linkRealization.getToConcept());
-        oldValue.setLinkValue(linkRealization.getLinkValue());
+            // Copy data over
+            oldValue.setLinkName(linkRealization.getLinkName());
+            oldValue.setToConcept(linkRealization.getToConcept());
+            oldValue.setLinkValue(linkRealization.getLinkValue());
 
-        linkRealization = dao.find(linkRealization);
-        linkRealization.setLinkName(newLinkName);
-        linkRealization.setToConcept(newToConcept);
-        linkRealization.setLinkValue(newLinkValue);
+            linkRealization = dao.find(linkRealization);
+            linkRealization.setLinkName(newLinkName);
+            linkRealization.setToConcept(newToConcept);
+            linkRealization.setLinkValue(newLinkValue);
 
-        History history = toolBelt.getHistoryFactory().replaceLinkRealization(userAccount, oldValue, linkRealization);
-        linkRealization.getConceptMetadata().addHistory(history);
-        dao.persist(history);
+            History history = toolBelt.getHistoryFactory().replaceLinkRealization(userAccount, oldValue, linkRealization);
+
+            if (new ApproveHistory(){}.approve(userAccount, history, dao)) {
+                linkRealization.getConceptMetadata().addHistory(history);
+                dao.persist(history);
+                status = true;
+            }
+        }
+
+        catch (Exception e) {
+            System.err.println(e);
+            status = false;
+        }
+        
         dao.endTransaction();
         dao.close();
 
@@ -195,19 +198,25 @@ public class LinkRealizationUtil {
                 return false;
             }
 
-            ConceptMetadata conceptMetadata = concept.getConceptMetadata();
             LinkRealization lr = makeLinkRealization(toolBelt, linkName, toConcept, linkValue);
-            conceptMetadata.addLinkRealization(lr);
-
             History history = toolBelt.getHistoryFactory().add(userAccount, lr);
 
-            dao.persist(history);
+            if (new ApproveHistory(){}.approve(userAccount, history, dao)) {
+                ConceptMetadata conceptMetadata = concept.getConceptMetadata();
+                conceptMetadata.addLinkRealization(lr);
+                conceptMetadata.addHistory(history);
+                dao.persist(history);
+                status = true;
+            } else {
+                status = false;
+            }
+            
             dao.endTransaction();
             dao.close();
-
-            status = true;
         }
+
         catch (Exception e) {
+            System.err.println(e);
             status = false;
         }
 

@@ -803,7 +803,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         } 
         
         else {
-          return "{\"message\":\"Issue with adding link realization, linkName may already exist.\", \"code\": \"401\"}";
+          return "{\"message\":\"Issue with adding link realization.\", \"code\": \"401\"}";
         }
       }
   
