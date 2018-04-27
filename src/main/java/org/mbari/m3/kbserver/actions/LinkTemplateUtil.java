@@ -26,24 +26,64 @@ public class LinkTemplateUtil
 	private Concept concept;
 	private ConceptDAO dao;
 	private UserAccount userAccount;
+	private ToolBelt toolBelt;
 
 	public LinkTemplateUtil(String concept,ToolBelt toolBelt, String linkName, String linkValue, String toConcept, UserAccount userAccount)
 	{
 		this.linkValue = linkValue;
 		this.linkName = linkName;
 		this.toConcept = toConcept;
+		this.toolBelt = toolBelt;
 		dao  = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-		this.concept = dao.findByName(name);
+		this.concept = dao.findByName(concept);
 
         if (concept == null)
-            throw new RuntimeException("Unable to find " + name);
-
-
+            throw new RuntimeException("Unable to find " + concept);
 	}
 
 
-	public addTemplate()
+	public void addTemplate()
 	{
+		dao.startTransaction();
+		boolean ok = true;
+
+
+		LinkTemplate template = toolBelt.getKnowledgebaseFactory().newLinkTemplate();
+
+
+		Collection<LinkTemplate> linkTemplates = concept.getConceptMetadata().getLinkTemplates();
+
+		for (LinkTemplate s : linkTemplates) 
+		{
+            if (linkName.equals(s.getLinkName())) 
+            	throw new RuntimeException("Concept already has a link template with name: " + linkName);
+        }
+
+
+        template.setLinkName(linkName);
+        template.setLinkValue(linkValue);
+        template.setToConcept(toConcept);
+
+        History history = toolBelt.getHistoryFactory().add(userAccount, template);
+
+        if(new ApproveHistory(){}.approve(userAccount, history, dao))
+        {
+        	concept.getConceptMetadata().addLinkTemplate(template);
+            dao.persist(concept);
+            concept.getConceptMetadata().addHistory(history);
+            dao.persist(history);
+        }
+
+        else
+            ok = false;
+        
+        dao.endTransaction();
+        dao.close();
+        return ok;
+
+
+
+
 
 	}
 

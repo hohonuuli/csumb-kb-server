@@ -144,6 +144,43 @@ public class ConceptData
 		jsonString += "],";
 	}
 
+	public void getTemplates()
+	{
+
+		Collection<LinkTemplate> templates = concept.getConceptMetadata().getLinkTemplates();
+
+		jsonString += "\n\"templates\" : [";
+		int setSize = templates.size();
+		int i = 0;
+
+		for (LinkTemplate s: templates) 
+		{
+			if(i == setSize -1)
+			{
+
+				jsonString += "\n\t{\n\t  \"linkName\" : \"" + s.getLinkName() + "\",\n";
+				jsonString += "\t  \"toConcept\" : \"" + s.getToConcept() + "\",\n";
+				jsonString += "\t  \"linkValue\" : \"" + s.getLinkValue() + "\"";
+				jsonString += "\n\t}\n";
+				
+			}
+
+			else
+			{
+				jsonString += "\n\t{\n\t  \"linkName\" : \"" + s.getLinkName() + "\",\n";
+				jsonString += "\t  \"toConcept\" : \"" + s.getToConcept() + "\",\n";
+				jsonString += "\t  \"linkValue\" : \"" + s.getLinkValue() + "\"\n\t},";
+
+			}
+
+			i++;
+		}
+
+
+		jsonString += "],";
+
+	}
+
 		public void getHistory()
 	{
 
