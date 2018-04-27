@@ -759,7 +759,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
       }
     });
 
-    post("/addLinkRealizations", (request, response) -> {
+    post("/addLinkRealization", (request, response) -> {
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
