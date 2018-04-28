@@ -126,7 +126,48 @@ public class LinkTemplateUtil
         dao.endTransaction();
         dao.close();
         return ok;
+	}
+
+	public boolean deleteTemplate()
+	{
+		dao.startTransaction();
+		boolean ok = true;
+		boolean templateFound = false;
+	
+		LinkTemplate template = null;
+
+		Collection<LinkTemplate> linkTemplates = concept.getConceptMetadata().getLinkTemplates();
+
+		for (LinkTemplate s : linkTemplates)
+         {
+            if(oldLinkName.equals(s.getLinkName()))
+            {
+                template = s;
+                templateFound = true;
+                break; 
+            }
+         }
+
+         if(!templateFound)
+            throw new RuntimeException("Cannot delete template. Unable to find template with link name: " + oldLinkName);
+
+         History history = toolBelt.getHistoryFactory().delete(userAccount, template);
+
+         if(new ApproveHistory(){}.approve(userAccount, history, dao))
+         {
+        	concept.getConceptMetadata().removeLinkTemplate(template);
+ 			dao.remove(template);
+
+            concept.getConceptMetadata().addHistory(history);
+            dao.persist(history);
+         }
+
+        else
+            ok = false;
         
+        dao.endTransaction();
+        dao.close();
+        return ok;
 
 	}
 

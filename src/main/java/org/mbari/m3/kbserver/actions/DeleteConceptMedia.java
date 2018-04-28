@@ -68,9 +68,6 @@ public class DeleteConceptMedia
          for (Media s : conceptMedias)
          {
 
-            System.out.println("s-url: " + s.getUrl() + " length: " + s.getUrl().length());
-            System.out.println("url: " + url + " length: " + url.length());
-
             if(s.getUrl().equals(verifyUrl.toExternalForm()))
             {
                 media = s;
@@ -100,6 +97,7 @@ public class DeleteConceptMedia
 
             }
             concept.getConceptMetadata().removeMedia(media);
+            dao.remove(media);
             concept.getConceptMetadata().addHistory(history);
             dao.persist(history);
         }
