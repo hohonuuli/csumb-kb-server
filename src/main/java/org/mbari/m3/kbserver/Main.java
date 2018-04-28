@@ -19,6 +19,7 @@ import org.mbari.m3.kbserver.actions.DeleteConceptMedia;
 import org.mbari.m3.kbserver.actions.ChangeParent;
 import org.mbari.m3.kbserver.actions.JToken;
 import org.mbari.m3.kbserver.actions.LinkRealizationUtil;
+import org.mbari.m3.kbserver.actions.LinkTemplateUtil;
 import vars.UserAccountDAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
@@ -229,7 +230,7 @@ public class Main {
             return "{\"message\":\"type was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("url") == null)
-            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+            return "{\"message\":\"url was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("credit") == null)
             return "{\"message\":\"credit was not provided in endpoint\",\"code\": \"401\"}";
@@ -238,7 +239,7 @@ public class Main {
             return "{\"message\":\"caption was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("primary") == null)
-            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+            return "{\"message\":\"primary was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("jwt") == null)
             return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
@@ -311,7 +312,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
             return "{\"message\":\"caption was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("primary") == null)
-            return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+            return "{\"message\":\"primay was not provided in endpoint\",\"code\": \"401\"}";
 
         if(request.queryParams("jwt") == null)
             return "{\"message\":\"jwt not provided in endpoint\",\"code\": \"401\"}"; 
@@ -718,7 +719,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
       
        // Link realization
 
-    get("/getLinkRealizations", (request, response) -> {
+    post("/addLinkRealization/:name", (request, response) -> {
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
@@ -729,48 +730,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "jwt is: " + request.queryParams("jwt");
       }
 
-      if (request.queryParams("concept") == null) {
-        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
-      }
-    
-      UserAccount userAccount = findUser(request.queryParams("userName"));
-
-      if (userAccount == null) {
-        return "{\"message\":\"username not found\",\"code\": \"401\"}";
-      }
-
-      try {
-        JToken.verifyToken(request.queryParams("jwt"), userAccount);
-        
-        LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
-        response.type("application/json");
-
-        String linkRealizationResponse = linkRealizationUtil.getLinkRealizations(toolBelt, request.queryParams("concept")).toString();
-
-        if (linkRealizationResponse.equals("Error: LinkRealizations")) {
-          return "{\"message\":\"" + linkRealizationResponse + "\", \"code\": \"401\"}";
-        }
-        
-        return "{\"message\":\"" + linkRealizationResponse + "\", \"code\": \"200\"}";
-      }
-  
-      catch (Exception e) {
-          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
-      }
-    });
-
-    post("/addLinkRealization", (request, response) -> {
-      ToolBelt toolBelt = Initializer.getToolBelt();
-
-      if (request.queryParams("userName") == null) {
-        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
-      }
-      
-      if (request.queryParams("jwt") == null) {
-        return "jwt is: " + request.queryParams("jwt");
-      }
-
-      if (request.queryParams("concept") == null) {
+      if (request.params(":name") == null) {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
@@ -798,12 +758,12 @@ post("/updateConceptMedia/:name",(request,response) -> {
         LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
         response.type("application/json");
 
-        if (linkRealizationUtil.addLinkRealizations(toolBelt, request.queryParams("concept"), request.queryParams("linkName"), request.queryParams("toConcept"), request.queryParams("linkValue"))) {
+        if (linkRealizationUtil.addLinkRealizations(toolBelt, request.params(":name"), request.queryParams("linkName"), request.queryParams("toConcept"), request.queryParams("linkValue"))) {
           return "{\"message\":\"successly added link realization\", \"code\": \"200\"}";
         } 
         
         else {
-          return "{\"message\":\"Issue with adding link realization.\", \"code\": \"401\"}";
+          return "{\"message\":\"Issue with adding link realization, linkName may already exist.\", \"code\": \"401\"}";
         }
       }
   
@@ -812,7 +772,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
       }
     });
 
-    delete("/deleteLinkRealization", (request, response) -> {
+    delete("/deleteLinkRealization/:name", (request, response) -> {
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
@@ -823,7 +783,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "jwt is: " + request.queryParams("jwt");
       }
 
-      if (request.queryParams("concept") == null) {
+      if (request.params(":name") == null) {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
@@ -843,7 +803,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
         response.type("application/json");
 
-        if (linkRealizationUtil.deleteLinkRealization(toolBelt, request.queryParams("concept"), request.queryParams("linkName"))) {
+        if (linkRealizationUtil.deleteLinkRealization(toolBelt, request.params(":name"), request.queryParams("linkName"))) {
           return "{\"message\":\"successly deleted link realization\", \"code\": \"200\"}";
         } 
         
@@ -857,7 +817,8 @@ post("/updateConceptMedia/:name",(request,response) -> {
       }
     });
 
-    post("/updateLinkRealization", (request, response) -> {
+    post("/updateLinkRealization/:name", (request, response) -> {
+
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
@@ -868,7 +829,172 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "jwt is: " + request.queryParams("jwt");
       }
 
-      if (request.queryParams("concept") == null) {
+      if (request.params(":name") == null) {
+        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("toConcept") == null) {
+        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkName") == null) {
+        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkValue") == null) {
+        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+    
+      UserAccount userAccount = findUser(request.queryParams("userName"));
+
+      if (userAccount == null) {
+        return "{\"message\":\"username not found\",\"code\": \"401\"}";
+      }
+
+      try {
+        JToken.verifyToken(request.queryParams("jwt"), userAccount);
+        
+        LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
+        response.type("application/json");
+
+        if (!linkRealizationUtil.doesLinkRealizationExist(toolBelt, request.params(":name"), request.queryParams("linkName"))) {
+          return "{\"message\":\"successly updated link realization\", \"code\": \"200\"}";
+        } 
+        
+        else {
+          return "{\"message\":\"Issue with adding link realization\", \"code\": \"401\"}";
+        }
+      }
+  
+      catch (Exception e) {
+          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+      }
+    });
+
+
+
+    post("/addLinkTemplate/:name", (request, response) -> {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+
+      if (request.queryParams("userName") == null) {
+        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+      }
+      
+      if (request.queryParams("jwt") == null) {
+        return "jwt is: " + request.queryParams("jwt");
+      }
+
+      if (request.params(":name") == null) {
+        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("toConcept") == null) {
+        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkName") == null) {
+        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkValue") == null) {
+        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+    
+      UserAccount userAccount = findUser(request.queryParams("userName"));
+
+      if (userAccount == null) {
+        return "{\"message\":\"username not found\",\"code\": \"401\"}";
+      }
+
+      try {
+        JToken.verifyToken(request.queryParams("jwt"), userAccount);
+        //String concept,ToolBelt toolBelt, String linkName, String linkValue, String toConcept, UserAccount userAccount
+        LinkTemplateUtil fn = new LinkTemplateUtil(request.params(":name"),toolBelt,request.queryParams("linkName"),request.queryParams("linkValue"),request.queryParams("toConcept"), userAccount);
+        response.type("application/json");
+
+        if (fn.addTemplate())
+          return "{\"message\":\"successly added template\", \"code\": \"200\"}";
+        
+        else
+          return "{\"message\":\"Cannot add template, user is not admin.\", \"code\": \"401\"}";
+      }
+  
+      catch (Exception e) {
+          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+      }
+    });
+
+
+
+    post("/updateLinkTemplate/:name", (request, response) -> {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+
+      if (request.queryParams("userName") == null) {
+        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+      }
+      
+      if (request.queryParams("jwt") == null) {
+        return "jwt is: " + request.queryParams("jwt");
+      }
+
+      if (request.params(":name") == null) {
+        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("toConcept") == null) {
+        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newLinkName") == null) {
+        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkValue") == null) {
+        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("oldLinkName") == null) {
+        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+    
+      UserAccount userAccount = findUser(request.queryParams("userName"));
+
+      if (userAccount == null) {
+        return "{\"message\":\"username not found\",\"code\": \"401\"}";
+      }
+
+      try {
+        JToken.verifyToken(request.queryParams("jwt"), userAccount);
+
+        LinkTemplateUtil fn = new LinkTemplateUtil(request.params(":name"),toolBelt,request.queryParams("newLinkName"),request.queryParams("linkValue"),request.queryParams("toConcept"), userAccount);
+        response.type("application/json");
+
+        if (fn.updateTemplate(request.queryParams("oldLinkName")))
+          return "{\"message\":\"successly updated template\", \"code\": \"200\"}";
+        
+        else
+          return "{\"message\":\"Cannot update template, user is not admin.\", \"code\": \"401\"}";
+      }
+  
+      catch (Exception e) {
+          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+      }
+    });
+
+
+
+    delete("/deleteLinkTemplate/:name", (request, response) -> {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+
+      if (request.queryParams("userName") == null) {
+        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+      }
+      
+      if (request.queryParams("jwt") == null) {
+        return "jwt is: " + request.queryParams("jwt");
+      }
+
+      if (request.params(":name") == null) {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
@@ -904,23 +1030,24 @@ post("/updateConceptMedia/:name",(request,response) -> {
 
       try {
         JToken.verifyToken(request.queryParams("jwt"), userAccount);
-        
-        LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
+        //String concept,ToolBelt toolBelt, String linkName, String linkValue, String toConcept, UserAccount userAccount
+        LinkTemplateUtil fn = new LinkTemplateUtil(request.params(":name"),toolBelt,request.queryParams("linkName"),request.queryParams("linkValue"),request.queryParams("toConcept"), userAccount);
         response.type("application/json");
 
-        if (linkRealizationUtil.updateLinkRealization(toolBelt, request.queryParams("concept"), request.queryParams("oldLinkName"), request.queryParams("oldToConcept"), request.queryParams("oldLinkValue"), request.queryParams("newLinkName"), request.queryParams("newToConcept"), request.queryParams("newLinkValue"))) {
-          return "{\"message\":\"successly updated link realization\", \"code\": \"200\"}";
-        } 
+        if (fn.deleteTemplate())
+          return "{\"message\":\"successly deleted template\", \"code\": \"200\"}";
         
-        else {
-          return "{\"message\":\"Issue with adding link realization\", \"code\": \"401\"}";
-        }
+        else
+          return "{\"message\":\"Cannot delete template, user is not admin.\", \"code\": \"401\"}";
       }
   
       catch (Exception e) {
           return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
       }
     });
+
+
+
 	}
 
   public static UserAccount findUser(String userName)

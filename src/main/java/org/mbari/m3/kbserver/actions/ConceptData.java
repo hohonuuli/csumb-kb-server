@@ -8,6 +8,7 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.ToolBelt;
 import java.util.*;
@@ -36,6 +37,7 @@ public class ConceptData
 		getAlternatives();
 		getMedia();
 		getDescriptors();
+		getTemplates();
 		getHistory();
 		return jsonString;
 	}
@@ -144,6 +146,43 @@ public class ConceptData
 		jsonString += "],";
 	}
 
+	public void getTemplates()
+	{
+
+		Collection<LinkTemplate> templates = concept.getConceptMetadata().getLinkTemplates();
+
+		jsonString += "\n\"templates\" : [";
+		int setSize = templates.size();
+		int i = 0;
+
+		for (LinkTemplate s: templates) 
+		{
+			if(i == setSize -1)
+			{
+
+				jsonString += "\n\t{\n\t  \"linkName\" : \"" + s.getLinkName() + "\",\n";
+				jsonString += "\t  \"toConcept\" : \"" + s.getToConcept() + "\",\n";
+				jsonString += "\t  \"linkValue\" : \"" + s.getLinkValue() + "\"";
+				jsonString += "\n\t}\n";
+				
+			}
+
+			else
+			{
+				jsonString += "\n\t{\n\t  \"linkName\" : \"" + s.getLinkName() + "\",\n";
+				jsonString += "\t  \"toConcept\" : \"" + s.getToConcept() + "\",\n";
+				jsonString += "\t  \"linkValue\" : \"" + s.getLinkValue() + "\"\n\t},";
+
+			}
+
+			i++;
+		}
+
+
+		jsonString += "],";
+
+	}
+
 		public void getHistory()
 	{
 
@@ -152,7 +191,6 @@ public class ConceptData
 		int setSize = histories.size();
 		int i = 0;
 
-		System.out.println("BEFORE ITERATING THROUGH HISTORIES!!!!");
 		for(History s: histories)
 		{
 

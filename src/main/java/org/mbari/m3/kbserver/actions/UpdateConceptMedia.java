@@ -49,8 +49,7 @@ public class UpdateConceptMedia
         Media oldPrimaryMedia = null;
         Media oldMedia = null;
 		dao.startTransaction();
-		//media.setUrl(url);
-
+  
         Collection<Media> medias = concept.getConceptMetadata().getMedias();
          //Media media = null;
 
@@ -61,8 +60,9 @@ public class UpdateConceptMedia
             {
                 oldMedia = s;
                 urlFound = true;
-                break;
+                break; 
             }
+            
          }
 
          if(!urlFound)
@@ -117,25 +117,6 @@ public class UpdateConceptMedia
         }
 
 
-            if (media.isPrimary()) {
-                //final Concept concept = media.getConceptMetadata().getConcept();
-                oldPrimaryMedia = concept.getConceptMetadata().getPrimaryMedia(MediaTypes.getType(media.getType()));
-
-                if ((oldPrimaryMedia != null) && !oldPrimaryMedia.equals(media)) {
-                    // log.info("You are adding a primary media of '" + media.getUrl() + "' to " +
-                    //          concept.getPrimaryConceptName().getName() +
-                    //          ". This concept contained a primary media of '" + oldPrimaryMedia.getUrl() +
-                    //          "' which is now set to a secondary media");
-                    oldPrimaryMedia.setPrimary(false);
-                }
-            }
-
-
-
-
-
-
-
          //applying media to concept
          //concept.getConceptMetadata().addMedia(media);
          //concept.setOriginator(userAccount.getUserName());
@@ -155,6 +136,20 @@ public class UpdateConceptMedia
          //saving changes of concept
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
         {
+
+            if (media.isPrimary()) {
+                //final Concept concept = media.getConceptMetadata().getConcept();
+                oldPrimaryMedia = concept.getConceptMetadata().getPrimaryMedia(MediaTypes.getType(media.getType()));
+
+                if ((oldPrimaryMedia != null) && !oldPrimaryMedia.equals(media)) {
+                    // log.info("You are adding a primary media of '" + media.getUrl() + "' to " +
+                    //          concept.getPrimaryConceptName().getName() +
+                    //          ". This concept contained a primary media of '" + oldPrimaryMedia.getUrl() +
+                    //          "' which is now set to a secondary media");
+                    oldPrimaryMedia.setPrimary(false);
+                }
+            }
+            
             concept.getConceptMetadata().removeMedia(oldMedia);
             concept.getConceptMetadata().addMedia(media);
 
