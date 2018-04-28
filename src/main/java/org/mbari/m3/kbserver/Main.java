@@ -964,7 +964,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
 
       try {
         JToken.verifyToken(request.queryParams("jwt"), userAccount);
-        //String concept,ToolBelt toolBelt, String linkName, String linkValue, String toConcept, UserAccount userAccount
+
         LinkTemplateUtil fn = new LinkTemplateUtil(request.params(":name"),toolBelt,request.queryParams("newLinkName"),request.queryParams("linkValue"),request.queryParams("toConcept"), userAccount);
         response.type("application/json");
 
