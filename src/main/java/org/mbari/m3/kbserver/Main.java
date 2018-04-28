@@ -818,6 +818,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
     });
 
     post("/updateLinkRealization/:name", (request, response) -> {
+
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
@@ -997,16 +998,28 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
-      if (request.queryParams("toConcept") == null) {
-        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
+      if (request.queryParams("oldToConcept") == null) {
+        return "{\"message\":\"oldToConcept was not provided in endpoint\",\"code\": \"401\"}";
       }
 
-      if (request.queryParams("linkName") == null) {
-        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      if (request.queryParams("oldLinkName") == null) {
+        return "{\"message\":\"oldLinkName name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
-      if (request.queryParams("linkValue") == null) {
-        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      if (request.queryParams("oldLinkValue") == null) {
+        return "{\"message\":\"oldLinkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newToConcept") == null) {
+        return "{\"message\":\"newToConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newLinkName") == null) {
+        return "{\"message\":\"newLinkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newLinkValue") == null) {
+        return "{\"message\":\"newLinkValue name was not provided in endpoint\",\"code\": \"401\"}";
       }
     
       UserAccount userAccount = findUser(request.queryParams("userName"));
