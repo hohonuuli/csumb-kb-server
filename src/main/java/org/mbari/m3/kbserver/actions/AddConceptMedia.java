@@ -127,7 +127,6 @@ public class AddConceptMedia
         {
             //applying media to concept
             concept.getConceptMetadata().addMedia(media);
-            concept.setOriginator(userAccount.getUserName());
             dao.persist(concept);
             concept.getConceptMetadata().addHistory(history);
             dao.persist(history);

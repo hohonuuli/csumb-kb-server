@@ -79,6 +79,57 @@ public class LinkTemplateUtil
         return ok;
 	}
 
+	public boolean updateTemplate(String oldLinkName)
+	{
+		dao.startTransaction();
+		boolean ok = true;
+		LinkTemplate oldTemplate = null;
+		boolean templateFound = false;
+		LinkTemplate newTemplate = toolBelt.getKnowledgebaseFactory().newLinkTemplate();
+
+		Collection<LinkTemplate> linkTemplates = concept.getConceptMetadata().getLinkTemplates();
+
+		for (LinkTemplate s : linkTemplates)
+         {
+
+            if(oldLinkName.equals(s.getLinkName()))
+            {
+                oldTemplate = s;
+                templateFound = true;
+                break; 
+            }
+            
+         }
+
+         if(!templateFound)
+            throw new RuntimeException("Unable to find template with link name: " + oldLinkName);
+
+
+        newTemplate.setLinkName(linkName);
+        newTemplate.setLinkValue(linkValue);
+        newTemplate.setToConcept(toConcept);
+
+        History history = toolBelt.getHistoryFactory().replaceLinkTemplate(userAccount, oldTemplate, newTemplate);
+
+        if(new ApproveHistory(){}.approve(userAccount, history, dao))
+        {
+        	concept.getConceptMetadata().removeLinkTemplate(oldTemplate);
+        	concept.getConceptMetadata().addLinkTemplate(newTemplate);
+
+            concept.getConceptMetadata().addHistory(history);
+            dao.persist(history);
+        }
+
+        else
+            ok = false;
+        
+        dao.endTransaction();
+        dao.close();
+        return ok;
+        
+
+	}
+
 
 
 }

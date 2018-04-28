@@ -925,6 +925,63 @@ post("/updateConceptMedia/:name",(request,response) -> {
 
 
 
+    post("/updateLinkTemplate/:name", (request, response) -> {
+      ToolBelt toolBelt = Initializer.getToolBelt();
+
+      if (request.queryParams("userName") == null) {
+        return "{\"message\":\"username was not provided in endpoint\",\"code\": \"401\"}";
+      }
+      
+      if (request.queryParams("jwt") == null) {
+        return "jwt is: " + request.queryParams("jwt");
+      }
+
+      if (request.params(":name") == null) {
+        return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("toConcept") == null) {
+        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newLinkName") == null) {
+        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("linkValue") == null) {
+        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("oldLinkName") == null) {
+        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+    
+      UserAccount userAccount = findUser(request.queryParams("userName"));
+
+      if (userAccount == null) {
+        return "{\"message\":\"username not found\",\"code\": \"401\"}";
+      }
+
+      try {
+        JToken.verifyToken(request.queryParams("jwt"), userAccount);
+        //String concept,ToolBelt toolBelt, String linkName, String linkValue, String toConcept, UserAccount userAccount
+        LinkTemplateUtil fn = new LinkTemplateUtil(request.params(":name"),toolBelt,request.queryParams("newLinkName"),request.queryParams("linkValue"),request.queryParams("toConcept"), userAccount);
+        response.type("application/json");
+
+        if (fn.updateTemplate(request.queryParams("oldLinkName")))
+          return "{\"message\":\"successly updated template\", \"code\": \"200\"}";
+        
+        else
+          return "{\"message\":\"Cannot update template, user is not admin.\", \"code\": \"401\"}";
+      }
+  
+      catch (Exception e) {
+          return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
+      }
+    });
+
+
+
 	}
 
   public static UserAccount findUser(String userName)
