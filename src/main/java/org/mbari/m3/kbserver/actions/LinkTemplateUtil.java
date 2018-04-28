@@ -140,7 +140,7 @@ public class LinkTemplateUtil
 
 		for (LinkTemplate s : linkTemplates)
          {
-            if(oldLinkName.equals(s.getLinkName()))
+            if(linkName.equals(s.getLinkName()))
             {
                 template = s;
                 templateFound = true;
@@ -149,7 +149,7 @@ public class LinkTemplateUtil
          }
 
          if(!templateFound)
-            throw new RuntimeException("Cannot delete template. Unable to find template with link name: " + oldLinkName);
+            throw new RuntimeException("Cannot delete template. Unable to find template with link name: " + linkName);
 
          History history = toolBelt.getHistoryFactory().delete(userAccount, template);
 

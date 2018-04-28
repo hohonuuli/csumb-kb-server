@@ -1021,8 +1021,8 @@ post("/updateConceptMedia/:name",(request,response) -> {
         LinkTemplateUtil fn = new LinkTemplateUtil(request.params(":name"),toolBelt,request.queryParams("linkName"),request.queryParams("linkValue"),request.queryParams("toConcept"), userAccount);
         response.type("application/json");
 
-        if (fn.addTemplate())
-          return "{\"message\":\"successly added template\", \"code\": \"200\"}";
+        if (fn.deleteTemplate())
+          return "{\"message\":\"successly deleted template\", \"code\": \"200\"}";
         
         else
           return "{\"message\":\"Cannot delete template, user is not admin.\", \"code\": \"401\"}";

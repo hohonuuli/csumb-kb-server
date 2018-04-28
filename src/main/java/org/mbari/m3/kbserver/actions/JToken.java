@@ -41,7 +41,7 @@ public class JToken
 		{
 
 			Date targetTime = new Date(); 
-			targetTime = DateUtils.addMinutes(targetTime, (60 * 8);
+			targetTime = DateUtils.addMinutes(targetTime, (60 * 8));
 			boolean admin = (user.isAdministrator()) ? true : false;
 			Algorithm algorithm = Algorithm.HMAC256("secret");
 	    	String token = JWT.create()
