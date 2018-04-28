@@ -27,6 +27,7 @@ public class LinkTemplateUtil
 		this.linkName = linkName;
 		this.toConcept = toConcept;
 		this.toolBelt = toolBelt;
+		this.userAccount = userAccount;
 		dao  = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
 		this.concept = dao.findByName(concept);
 
@@ -56,8 +57,11 @@ public class LinkTemplateUtil
         template.setLinkValue(linkValue);
         template.setToConcept(toConcept);
 
-
+       
         History history = toolBelt.getHistoryFactory().add(userAccount, template);
+
+        if(history == null)
+        	System.out.println("history is null");
 
         if(new ApproveHistory(){}.approve(userAccount, history, dao))
         {

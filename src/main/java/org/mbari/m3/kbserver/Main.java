@@ -911,7 +911,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         LinkTemplateUtil fn = new LinkTemplateUtil(request.params(":name"),toolBelt,request.queryParams("linkName"),request.queryParams("linkValue"),request.queryParams("toConcept"), userAccount);
         response.type("application/json");
 
-        if (fn.addTemplate() 
+        if (fn.addTemplate())
           return "{\"message\":\"successly added template\", \"code\": \"200\"}";
         
         else
