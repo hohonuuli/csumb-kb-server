@@ -719,7 +719,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
       
        // Link realization
 
-    post("/addLinkRealizations", (request, response) -> {
+    post("/addLinkRealization/:name", (request, response) -> {
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
@@ -730,7 +730,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "jwt is: " + request.queryParams("jwt");
       }
 
-      if (request.queryParams("concept") == null) {
+      if (request.params(":name") == null) {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
@@ -758,7 +758,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
         response.type("application/json");
 
-        if (linkRealizationUtil.addLinkRealizations(toolBelt, request.queryParams("concept"), request.queryParams("linkName"), request.queryParams("toConcept"), request.queryParams("linkValue"))) {
+        if (linkRealizationUtil.addLinkRealizations(toolBelt, request.params(":name"), request.queryParams("linkName"), request.queryParams("toConcept"), request.queryParams("linkValue"))) {
           return "{\"message\":\"successly added link realization\", \"code\": \"200\"}";
         } 
         
@@ -772,7 +772,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
       }
     });
 
-    delete("/deleteLinkRealization", (request, response) -> {
+    delete("/deleteLinkRealization/:name", (request, response) -> {
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
@@ -783,7 +783,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "jwt is: " + request.queryParams("jwt");
       }
 
-      if (request.queryParams("concept") == null) {
+      if (request.params(":name") == null) {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
@@ -803,7 +803,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
         response.type("application/json");
 
-        if (linkRealizationUtil.deleteLinkRealization(toolBelt, request.queryParams("concept"), request.queryParams("linkName"))) {
+        if (linkRealizationUtil.deleteLinkRealization(toolBelt, request.params(":name"), request.queryParams("linkName"))) {
           return "{\"message\":\"successly deleted link realization\", \"code\": \"200\"}";
         } 
         
@@ -817,7 +817,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
       }
     });
 
-    post("/updateLinkRealization", (request, response) -> {
+    post("/updateLinkRealization/:name", (request, response) -> {
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
@@ -828,7 +828,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "jwt is: " + request.queryParams("jwt");
       }
 
-      if (request.queryParams("concept") == null) {
+      if (request.params(":name") == null) {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
@@ -856,7 +856,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
         LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
         response.type("application/json");
 
-        if (!linkRealizationUtil.doesLinkRealizationExist(toolBelt, request.queryParams("concept"), request.queryParams("linkName"))) {
+        if (!linkRealizationUtil.doesLinkRealizationExist(toolBelt, request.params(":name"), request.queryParams("linkName"))) {
           return "{\"message\":\"successly updated link realization\", \"code\": \"200\"}";
         } 
         
