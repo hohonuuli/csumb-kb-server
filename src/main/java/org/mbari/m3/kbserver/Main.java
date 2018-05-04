@@ -926,7 +926,7 @@ post("/updateConceptMedia/:name",(request,response) -> {
 
 
 
-    post("/updateLinkTemplate/:name", (request, response) -> {
+    post("/updateLinkRealization", (request, response) -> {
       ToolBelt toolBelt = Initializer.getToolBelt();
 
       if (request.queryParams("userName") == null) {
@@ -937,24 +937,32 @@ post("/updateConceptMedia/:name",(request,response) -> {
         return "jwt is: " + request.queryParams("jwt");
       }
 
-      if (request.params(":name") == null) {
+      if (request.queryParams("concept") == null) {
         return "{\"message\":\"concept name was not provided in endpoint\",\"code\": \"401\"}";
       }
 
-      if (request.queryParams("toConcept") == null) {
-        return "{\"message\":\"toConcept was not provided in endpoint\",\"code\": \"401\"}";
-      }
-
-      if (request.queryParams("newLinkName") == null) {
-        return "{\"message\":\"linkName name was not provided in endpoint\",\"code\": \"401\"}";
-      }
-
-      if (request.queryParams("linkValue") == null) {
-        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      if (request.queryParams("oldToConcept") == null) {
+        return "{\"message\":\"oldToConcept was not provided in endpoint\",\"code\": \"401\"}";
       }
 
       if (request.queryParams("oldLinkName") == null) {
-        return "{\"message\":\"linkValue name was not provided in endpoint\",\"code\": \"401\"}";
+        return "{\"message\":\"oldLinkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("oldLinkValue") == null) {
+        return "{\"message\":\"oldLinkValue name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newToConcept") == null) {
+        return "{\"message\":\"newToConcept was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newLinkName") == null) {
+        return "{\"message\":\"newLinkName name was not provided in endpoint\",\"code\": \"401\"}";
+      }
+
+      if (request.queryParams("newLinkValue") == null) {
+        return "{\"message\":\"newLinkValue name was not provided in endpoint\",\"code\": \"401\"}";
       }
     
       UserAccount userAccount = findUser(request.queryParams("userName"));
@@ -965,22 +973,23 @@ post("/updateConceptMedia/:name",(request,response) -> {
 
       try {
         JToken.verifyToken(request.queryParams("jwt"), userAccount);
-
-        LinkTemplateUtil fn = new LinkTemplateUtil(request.params(":name"),toolBelt,request.queryParams("newLinkName"),request.queryParams("linkValue"),request.queryParams("toConcept"), userAccount);
+        
+        LinkRealizationUtil linkRealizationUtil = new LinkRealizationUtil(userAccount);
         response.type("application/json");
 
-        if (fn.updateTemplate(request.queryParams("oldLinkName")))
-          return "{\"message\":\"successly updated template\", \"code\": \"200\"}";
+        if (linkRealizationUtil.updateLinkRealization(toolBelt, request.queryParams("concept"), request.queryParams("oldLinkName"), request.queryParams("oldToConcept"), request.queryParams("oldLinkValue"), request.queryParams("newLinkName"), request.queryParams("newToConcept"), request.queryParams("newLinkValue"))) {
+          return "{\"message\":\"successly updated link realization\", \"code\": \"200\"}";
+        } 
         
-        else
-          return "{\"message\":\"Cannot update template, user is not admin.\", \"code\": \"401\"}";
+        else {
+          return "{\"message\":\"Issue with adding link realization\", \"code\": \"401\"}";
+        }
       }
   
       catch (Exception e) {
           return "{\"message\":\"" + e.getMessage() + "\", \"code\": \"401\"}";
       }
     });
-
 
 
     delete("/deleteLinkTemplate/:name", (request, response) -> {
