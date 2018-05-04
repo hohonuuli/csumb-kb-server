@@ -146,6 +146,8 @@ public class LinkRealizationUtil {
         // Get the old link realization, used for history tracking
         LinkRealization linkRealization = findLinkRealizationByName(toolBelt, conceptName, oldLinkName);
 
+        dao.merge(linkRealization);
+        
         // Didn't exist
         if (linkRealization == null) {
             return false;
